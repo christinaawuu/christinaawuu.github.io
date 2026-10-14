@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 140" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>.sw{animation:s 4s ease-in-out infinite;transform-origin:55px 100px}@keyframes s{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}</style>
+<ellipse cx="55" cy="130" rx="34" ry="7" fill="#3b2f3a" opacity=".18" stroke="none"/>
+<path d="M50 128l2-40h6l2 40z" fill="#8a5a44"/>
+<g class="sw"><circle cx="38" cy="64" r="24" fill="#6fa987"/><circle cx="72" cy="64" r="24" fill="#6fa987"/><circle cx="55" cy="38" r="28" fill="#8fb996"/>
+<circle cx="55" cy="72" r="26" fill="#8fb996"/>
+<path d="M44 34a6 6 0 016-6M30 62a6 6 0 016-6" stroke="#cfe8d4" stroke-width="3"/></g>
+</svg>

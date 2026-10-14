@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 150" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>.g{animation:gl 2s ease-in-out infinite}@keyframes gl{0%,100%{opacity:.45}50%{opacity:.9}}</style>
+<ellipse cx="70" cy="140" rx="60" ry="8" fill="#3b2f3a" opacity=".18" stroke="none"/>
+<rect x="18" y="80" width="104" height="56" rx="6" fill="#5b5566"/>
+<path d="M32 136V96h76v40z" fill="#2f2a38"/>
+<path d="M38 136V104M52 136V104M66 136V104M80 136V104M94 136V104" stroke="#5b5566" stroke-width="2.5"/>
+<path d="M18 80h104" stroke-width="3.5"/>
+<!-- railings and lamps -->
+<path d="M20 80V50M120 80V50" stroke="#2f7d5b" stroke-width="5"/>
+<circle class="g" cx="20" cy="42" r="17" fill="#8be0a4" stroke="none"/><circle class="g" cx="120" cy="42" r="17" fill="#8be0a4" stroke="none"/>
+<circle cx="20" cy="42" r="9" fill="#fdf6ec"/><circle cx="120" cy="42" r="9" fill="#fdf6ec"/>
+<!-- sign -->
+<circle cx="70" cy="58" r="14" fill="#2f7d5b"/><path d="M64 65V51l6 9 6-9v14" stroke="#fdf6ec" stroke-width="3"/>
+<path d="M20 50h100" stroke="#2f7d5b" stroke-width="4"/>
+</svg>

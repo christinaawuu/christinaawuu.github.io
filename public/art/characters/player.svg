@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 100" fill="none" stroke="#3b2f3a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+<style>.bob{animation:b 1.1s ease-in-out infinite}@keyframes b{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}</style>
+<ellipse cx="32" cy="94" rx="19" ry="5" fill="#3b2f3a" opacity=".2" stroke="none"/>
+<g class="bob">
+<!-- legs and shoes -->
+<rect x="20" y="66" width="10" height="20" rx="4" fill="#3d4a7a"/><rect x="34" y="66" width="10" height="20" rx="4" fill="#3d4a7a"/>
+<rect x="17" y="82" width="15" height="9" rx="4" fill="#fdf6ec"/><rect x="32" y="82" width="15" height="9" rx="4" fill="#fdf6ec"/>
+<!-- body: hoodie -->
+<rect x="15" y="42" width="34" height="30" rx="11" fill="#e8505b"/>
+<path d="M32 46v14" stroke-width="2"/><rect x="25" y="58" width="14" height="8" rx="3" fill="#c63d49" stroke-width="2"/>
+<rect x="8" y="46" width="9" height="20" rx="4.5" fill="#e8505b"/><rect x="47" y="46" width="9" height="20" rx="4.5" fill="#e8505b"/>
+<circle cx="12.5" cy="68" r="4" fill="#f2c6a0"/><circle cx="51.5" cy="68" r="4" fill="#f2c6a0"/>
+<!-- head -->
+<circle cx="32" cy="28" r="18" fill="#f2c6a0"/>
+<path d="M14 28a18 18 0 0136 0c-4-8-10-11-18-11s-14 3-18 11z" fill="#4a3328"/>
+<circle cx="32" cy="9" r="7" fill="#4a3328"/>
+<circle cx="25" cy="31" r="2.2" fill="#3b2f3a" stroke="none"/><circle cx="39" cy="31" r="2.2" fill="#3b2f3a" stroke="none"/>
+<circle cx="21" cy="36" r="3" fill="#f59a9a" stroke="none" opacity=".7"/><circle cx="43" cy="36" r="3" fill="#f59a9a" stroke="none" opacity=".7"/>
+<path d="M29 37q3 3 6 0" stroke-width="2"/>
+</g>
+</svg>

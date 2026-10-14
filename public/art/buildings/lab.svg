@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>
+.glow{animation:gl 2.4s ease-in-out infinite}
+@keyframes gl{0%,100%{opacity:.3}50%{opacity:.65}}
+.bub{animation:up 2.6s ease-in infinite}.bub2{animation:up 2.6s ease-in 1.2s infinite}
+@keyframes up{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-14px);opacity:0}}
+</style>
+<ellipse cx="120" cy="248" rx="104" ry="10" fill="#3b2f3a" opacity=".15" stroke="none"/>
+<circle class="glow" cx="120" cy="150" r="90" fill="#9be3d2" stroke="none"/>
+<rect x="28" y="58" width="184" height="186" rx="8" fill="#4f9d8f"/>
+<rect x="20" y="46" width="200" height="20" rx="6" fill="#3b7f73"/>
+<!-- upper windows -->
+<rect x="44" y="78" width="38" height="44" rx="6" fill="#cfe8f3"/><rect x="101" y="78" width="38" height="44" rx="6" fill="#cfe8f3"/><rect x="158" y="78" width="38" height="44" rx="6" fill="#cfe8f3"/>
+<path d="M63 78v44M120 78v44M177 78v44" stroke-width="2"/>
+<!-- sign -->
+<rect x="62" y="130" width="116" height="26" rx="8" fill="#fdf6ec"/>
+<path d="M116 136h8v6l5 9h-18l5-9z" fill="#9be3d2" stroke-width="2.5"/>
+<circle cx="86" cy="143" r="5" fill="#e8505b" stroke-width="2"/><circle cx="154" cy="143" r="5" fill="#f6c453" stroke-width="2"/>
+<!-- awning -->
+<path d="M34 164h172l-8 22H42z" fill="#fdf6ec"/>
+<path d="M54 164l-4 22M82 164l-2 22M110 164v22M138 164l2 22M166 164l4 22M190 164l4 22" stroke="#e8505b" stroke-width="7" stroke-linecap="butt"/>
+<path d="M34 164h172l-8 22H42z"/>
+<!-- storefront -->
+<rect x="44" y="190" width="92" height="54" rx="6" fill="#cfe8f3"/>
+<path d="M90 190v54" stroke-width="2"/>
+<rect x="150" y="190" width="44" height="54" rx="6" fill="#3b7f73"/>
+<rect x="158" y="198" width="28" height="26" rx="4" fill="#ffe9a8"/>
+<!-- flask in window -->
+<path d="M58 238v-10l-8-14h20l-8 14v10z" fill="#9be3d2" stroke-width="2.5"/>
+<circle class="bub" cx="60" cy="210" r="2.5" fill="#fdf6ec" stroke-width="1.5"/><circle class="bub2" cx="64" cy="208" r="2" fill="#fdf6ec" stroke-width="1.5"/>
+<rect x="104" y="218" width="24" height="26" rx="3" fill="#fdf6ec" stroke-width="2"/><path d="M109 226h14M109 232h14" stroke-width="2"/>
+</svg>
