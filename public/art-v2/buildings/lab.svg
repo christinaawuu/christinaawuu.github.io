@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 250" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>.glow{animation:gl 2.4s ease-in-out infinite}@keyframes gl{0%,100%{opacity:.28}50%{opacity:.6}}
+.bub{animation:up 2.6s ease-out infinite}.bub2{animation:up 2.6s ease-out 1.3s infinite}@keyframes up{0%{transform:translateY(0);opacity:0}25%{opacity:.9}100%{transform:translateY(-18px);opacity:0}}</style>
+<path d="M44 66h198l4 180H50z" fill="#3b2f3a" opacity=".17" stroke="none"/>
+<circle class="glow" cx="120" cy="150" r="104" fill="#9be3d2" stroke="none"/>
+<rect x="26" y="146" width="188" height="94" rx="6" fill="#4f9d8f"/>
+<!-- awning -->
+<path d="M30 168h180l-6 22H36z" fill="#fdf6ec"/>
+<path d="M52 168l-3 22M82 168l-1 22M110 168v22M138 168l1 22M166 168l3 22M192 168l3 22" stroke="#e8505b" stroke-width="7" stroke-linecap="butt"/>
+<path d="M30 168h180l-6 22H36z"/>
+<rect x="38" y="196" width="100" height="42" rx="5" fill="#cfe8f3"/><path d="M88 196v42" stroke-width="2"/>
+<rect x="152" y="196" width="48" height="44" rx="5" fill="#3b7f73"/><rect x="160" y="203" width="32" height="20" rx="3" fill="#ffe9a8"/>
+<!-- roof -->
+<rect x="14" y="30" width="212" height="126" rx="10" fill="#3b7f73"/>
+<rect x="24" y="40" width="192" height="106" rx="6" fill="#5fb3a4"/>
+<path d="M24 56h192M24 72h192M24 88h192M24 104h192M24 120h192" stroke-width="1" opacity=".2"/>
+<rect x="24" y="146" width="192" height="8" fill="#3b2f3a" opacity=".18" stroke="none"/>
+<!-- skylights -->
+<rect x="36" y="56" width="52" height="38" rx="4" fill="#cfe8f3"/><path d="M62 56v38M36 75h52" stroke-width="2"/>
+<rect x="152" y="56" width="52" height="38" rx="4" fill="#cfe8f3"/><path d="M178 56v38M152 75h52" stroke-width="2"/>
+<!-- flask vent -->
+<circle cx="120" cy="100" r="22" fill="#fdf6ec"/><circle cx="120" cy="100" r="14" fill="#9be3d2"/>
+<circle class="bub" cx="116" cy="96" r="3" fill="#fdf6ec" stroke-width="1.5"/><circle class="bub2" cx="124" cy="98" r="2.5" fill="#fdf6ec" stroke-width="1.5"/>
+<rect x="36" y="112" width="28" height="22" rx="3" fill="#cfc8d6" stroke-width="2"/><rect x="176" y="112" width="28" height="22" rx="3" fill="#cfc8d6" stroke-width="2"/>
+</svg>

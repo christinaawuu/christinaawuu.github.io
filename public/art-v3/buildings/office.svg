@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 282 300" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<!-- depth: cast shadow, side wall, roof edge -->
+<path d="M196 286 L258 278 L258 298 L196 296z" fill="#3b2f3a" opacity=".16" stroke="none"/>
+<path d="M196 56 L232 34 L232 264 L196 286z" fill="#566b80"/>
+<g transform="translate(196 56) matrix(1 -0.6111 0 1 0 0)" stroke-width="2"><rect x="8" y="10" width="20" height="19" rx="3" fill="#cfe8f3" opacity=".85" stroke-width="2"/><rect x="8" y="48" width="20" height="19" rx="3" fill="#cfe8f3" opacity=".85" stroke-width="2"/><rect x="8" y="86" width="20" height="19" rx="3" fill="#cfe8f3" opacity=".85" stroke-width="2"/><rect x="8" y="125" width="20" height="19" rx="3" fill="#cfe8f3" opacity=".85" stroke-width="2"/><rect x="8" y="163" width="20" height="19" rx="3" fill="#cfe8f3" opacity=".85" stroke-width="2"/><rect x="8" y="201" width="20" height="19" rx="3" fill="#cfe8f3" opacity=".85" stroke-width="2"/></g>
+<path d="M196 56 L232 34 L232 264 L196 286z" fill="none"/>
+<path d="M36 56 L72 34 L240 34 L204 56z" fill="#8fa3b8"/>
+
+<style>
+.glow{animation:gl 2.4s ease-in-out infinite}
+@keyframes gl{0%,100%{opacity:.3}50%{opacity:.65}}
+.w{animation:f 5s ease-in-out infinite}.w2{animation:f 5s ease-in-out 2s infinite}
+@keyframes f{0%,100%{fill:#cfe8f3}50%{fill:#ffe9a8}}
+.beacon{animation:bk 1.6s steps(1) infinite}@keyframes bk{0%{fill:#e8505b}50%{fill:#fdf6ec}}
+</style>
+<ellipse cx="120" cy="288" rx="96" ry="10" fill="#3b2f3a" opacity=".15" stroke="none"/>
+<circle class="glow" cx="120" cy="170" r="100" fill="#b8c9dc" stroke="none"/>
+<path d="M120 10v26"/><circle class="beacon" cx="120" cy="9" r="5" fill="#e8505b" stroke-width="2"/>
+<rect x="74" y="36" width="92" height="22" rx="5" fill="#566b80"/>
+<rect x="44" y="56" width="152" height="230" rx="8" fill="#6b7f94"/>
+<rect x="36" y="48" width="168" height="16" rx="5" fill="#566b80"/>
+<g>
+<rect class="w" x="58" y="78" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w2" x="105" y="78" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w" x="152" y="78" width="30" height="26" rx="4" fill="#cfe8f3"/>
+<rect class="w2" x="58" y="116" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w" x="105" y="116" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w2" x="152" y="116" width="30" height="26" rx="4" fill="#cfe8f3"/>
+<rect class="w" x="58" y="154" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w2" x="105" y="154" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w" x="152" y="154" width="30" height="26" rx="4" fill="#cfe8f3"/>
+<rect class="w2" x="58" y="192" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w" x="105" y="192" width="30" height="26" rx="4" fill="#cfe8f3"/><rect class="w2" x="152" y="192" width="30" height="26" rx="4" fill="#cfe8f3"/>
+</g>
+<rect x="92" y="236" width="56" height="50" rx="6" fill="#3d4a7a"/>
+<rect x="98" y="242" width="20" height="38" rx="3" fill="#ffe9a8"/><rect x="122" y="242" width="20" height="38" rx="3" fill="#ffe9a8"/>
+<rect x="60" y="248" width="20" height="38" rx="3" fill="#566b80"/><rect x="160" y="248" width="20" height="38" rx="3" fill="#566b80"/>
+</svg>

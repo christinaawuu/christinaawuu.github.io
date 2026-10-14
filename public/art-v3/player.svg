@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="player" viewBox="0 0 72 112" fill="none" stroke="#3b2f3a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" data-dir="front">
+<style>
+#player[data-dir=front] .back, #player[data-dir=front] .side,
+#player[data-dir=back] .front, #player[data-dir=back] .side,
+#player[data-dir=left] .front, #player[data-dir=left] .back,
+#player[data-dir=right] .front, #player[data-dir=right] .back { display: none }
+#player[data-dir=right] .side { transform: translateX(72px) scaleX(-1) }
+#player .body { animation: idle 1.6s ease-in-out infinite }
+@keyframes idle { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.2px) } }
+#player.moving .body { animation: hop .34s ease-in-out infinite }
+@keyframes hop { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+#player.moving .legA { animation: stepA .34s ease-in-out infinite }
+#player.moving .legB { animation: stepB .34s ease-in-out infinite }
+@keyframes stepA { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+@keyframes stepB { 0%,100% { transform: translateY(-4px) } 50% { transform: translateY(0) } }
+#player.moving .swingA { animation: swA .34s ease-in-out infinite; transform-origin: 36px 82px }
+#player.moving .swingB { animation: swB .34s ease-in-out infinite; transform-origin: 36px 82px }
+@keyframes swA { 0%,100% { transform: rotate(-14deg) } 50% { transform: rotate(14deg) } }
+@keyframes swB { 0%,100% { transform: rotate(14deg) } 50% { transform: rotate(-14deg) } }
+</style>
+<ellipse cx="36" cy="106" rx="20" ry="5" fill="#3b2f3a" opacity=".22" stroke="none"/>
+
+<!-- ============ FRONT ============ -->
+<g class="front">
+ <g class="legA"><path d="M24 76h13l2 22H21z" fill="#3b3a4a"/><rect x="18" y="96" width="21" height="9" rx="4.5" fill="#fdf6ec"/></g>
+ <g class="legB"><path d="M35 76h13l3 22H33z" fill="#3b3a4a"/><rect x="33" y="96" width="21" height="9" rx="4.5" fill="#fdf6ec"/></g>
+ <g class="body">
+  <!-- long hair behind -->
+  <path d="M17 30c-3 14-3 30 1 42h36c4-12 4-28 1-42z" fill="#2b2433"/>
+  <!-- coat -->
+  <path d="M17 48q0-8 19-8t19 8l4 34H13z" fill="#d1a97d"/>
+  <path d="M30 42h12l-1 38H31z" fill="#fdf6ec" stroke-width="2"/>
+  <path d="M30 42l-5 14M42 42l5 14" stroke-width="2"/>
+  <path d="M14 70h44" stroke="#a98259" stroke-width="3"/>
+  <rect x="8" y="46" width="10" height="26" rx="5" fill="#d1a97d"/><rect x="54" y="46" width="10" height="26" rx="5" fill="#d1a97d"/>
+  <circle cx="13" cy="74" r="4.5" fill="#f6d3b3"/><circle cx="59" cy="74" r="4.5" fill="#f6d3b3"/>
+  <!-- crossbody bag -->
+  <path d="M52 44L24 78" stroke="#3d4a7a" stroke-width="3"/><rect x="18" y="72" width="16" height="12" rx="3" fill="#3d4a7a"/>
+  <!-- hair locks over shoulders -->
+  <path d="M18 36c-3 10-3 22 0 32l8 2c1-12 1-24-2-34z" fill="#2b2433"/><path d="M54 36c3 10 3 22 0 32l-8 2c-1-12-1-24 2-34z" fill="#2b2433"/>
+  <!-- head -->
+  <ellipse cx="36" cy="27" rx="17" ry="18" fill="#f6d3b3"/>
+  <!-- middle part hair -->
+  <path d="M18 28c-1-13 7-21 18-21s19 8 18 21c-3-8-9-15-18-18-9 3-15 10-18 18z" fill="#2b2433"/>
+  <path d="M36 9v1" stroke="#f6d3b3" stroke-width="2"/>
+  <path d="M24 16c3-3 7-5 12-6" stroke="#5a4a66" stroke-width="2"/>
+  <ellipse cx="29" cy="30" rx="2.2" ry="2.8" fill="#2b2433" stroke="none"/><ellipse cx="43" cy="30" rx="2.2" ry="2.8" fill="#2b2433" stroke="none"/>
+  <circle cx="24.5" cy="36" r="3" fill="#f59a9a" stroke="none" opacity=".6"/><circle cx="47.5" cy="36" r="3" fill="#f59a9a" stroke="none" opacity=".6"/>
+  <path d="M33 38q3 2.5 6 0" stroke-width="2"/>
+ </g>
+</g>
+
+<!-- ============ BACK ============ -->
+<g class="back">
+ <g class="legA"><path d="M24 76h13l2 22H21z" fill="#3b3a4a"/><rect x="18" y="96" width="21" height="9" rx="4.5" fill="#fdf6ec"/></g>
+ <g class="legB"><path d="M35 76h13l3 22H33z" fill="#3b3a4a"/><rect x="33" y="96" width="21" height="9" rx="4.5" fill="#fdf6ec"/></g>
+ <g class="body">
+  <path d="M17 48q0-8 19-8t19 8l4 34H13z" fill="#d1a97d"/>
+  <path d="M36 42v38" stroke-width="2"/><path d="M14 70h44" stroke="#a98259" stroke-width="3"/>
+  <rect x="8" y="46" width="10" height="26" rx="5" fill="#d1a97d"/><rect x="54" y="46" width="10" height="26" rx="5" fill="#d1a97d"/>
+  <path d="M52 44L24 78" stroke="#3d4a7a" stroke-width="3"/>
+  <!-- long hair back -->
+  <path d="M16 28c-1-14 8-22 20-22s21 8 20 22c3 14 2 30-2 44-6 4-12 4-18 3-6 1-12 1-18-3-4-14-5-30-2-44z" fill="#2b2433"/>
+  <path d="M36 12v58" stroke="#3f3450" stroke-width="2"/><path d="M26 22c-2 12-2 26 0 40M46 22c2 12 2 26 0 40" stroke="#4a3d5a" stroke-width="2"/>
+ </g>
+</g>
+
+<!-- ============ SIDE (faces left) ============ -->
+<g class="side">
+ <g class="swingB"><path d="M31 76h12l2 22H29z" fill="#2f2e3c"/><rect x="25" y="96" width="21" height="9" rx="4.5" fill="#e8e0d4"/></g>
+ <g class="swingA"><path d="M30 76h12l2 22H28z" fill="#3b3a4a"/><rect x="22" y="96" width="21" height="9" rx="4.5" fill="#fdf6ec"/></g>
+ <g class="body">
+  <!-- long hair streaming behind (right) -->
+  <path d="M36 12c14-2 24 6 24 22 0 14-2 28-6 38-6 2-12 0-18-2z" fill="#2b2433"/>
+  <path d="M24 48q0-8 12-8t12 8l2 34H22z" fill="#d1a97d"/>
+  <path d="M30 70h22" stroke="#a98259" stroke-width="3"/>
+  <rect x="30" y="46" width="12" height="28" rx="6" fill="#d1a97d"/><circle cx="36" cy="76" r="4.5" fill="#f6d3b3"/>
+  <rect x="38" y="68" width="14" height="12" rx="3" fill="#3d4a7a"/>
+  <!-- head -->
+  <ellipse cx="33" cy="27" rx="16" ry="18" fill="#f6d3b3"/>
+  <path d="M17 28c-1-13 7-21 18-21 10 0 17 7 17 21-4-9-10-15-17-16-7 1-14 7-18 16z" fill="#2b2433"/>
+  <path d="M46 20c4 8 4 24 0 34" fill="#2b2433"/>
+  <ellipse cx="24" cy="30" rx="2" ry="2.8" fill="#2b2433" stroke="none"/>
+  <circle cx="22" cy="36" r="3" fill="#f59a9a" stroke="none" opacity=".6"/>
+  <path d="M19 34l-2 3 3 1" stroke-width="2"/>
+ </g>
+</g>
+</svg>

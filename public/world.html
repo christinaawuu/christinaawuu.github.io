@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>NYC world prototype | Christina Wu</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #3b3547; font-family: 'Nunito','Segoe UI',system-ui,sans-serif; }
+  #stage { position: fixed; inset: 0; overflow: hidden; touch-action: none; cursor: pointer; user-select: none; -webkit-user-select: none; }
+  #world { position: absolute; left: 0; top: 0; width: 1920px; height: 1050px; transform-origin: 0 0; background: #5b5566; }
+  .abs { position: absolute; }
+  .ent { position: absolute; pointer-events: none; }
+  .ent img, .ent svg { width: 100%; height: 100%; display: block; }
+  .near img { filter: drop-shadow(0 0 10px #ffe9a8) drop-shadow(0 0 22px #ffd36e); }
+  .tag { position: absolute; z-index: 5000; transform: translateX(-50%); padding: 4px 12px; border-radius: 999px; background: #fff; color: #2b2433; font-weight: 800; font-size: 13px; box-shadow: 0 3px 10px rgba(0,0,0,.25); white-space: nowrap; pointer-events: none; border: 2px solid var(--c); }
+  .road-label { position: absolute; color: #fdf6ec; opacity: .5; font-weight: 800; letter-spacing: 6px; font-size: 15px; white-space: nowrap; pointer-events: none; }
+  .v { writing-mode: vertical-rl; }
+  .ripple { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; border: 3px solid #ffe9a8; animation: rp .6s ease-out forwards; pointer-events: none; z-index: 1; }
+  @keyframes rp { from { transform: scale(.3); opacity: 1 } to { transform: scale(1.4); opacity: 0 } }
+  #hud { position: fixed; left: 12px; top: 12px; background: rgba(253,246,236,.94); border-radius: 14px; padding: 10px 14px; box-shadow: 0 4px 14px rgba(0,0,0,.25); max-width: 260px; z-index: 10000; }
+  #hud h1 { margin: 0 0 2px; font-size: 1rem; }
+  #hud p { margin: 0 0 6px; font-size: .78rem; color: #6d6578; }
+  #hud a { font-size: .8rem; font-weight: 800; color: #2b2433; }
+  #prompt { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: #fff; border-radius: 999px; padding: 12px 22px; font-weight: 800; box-shadow: 0 6px 20px rgba(0,0,0,.3); display: none; z-index: 10000; cursor: pointer; border: 3px solid var(--c, #e8505b); text-align: center; }
+  #toast { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); background: #2b2433; color: #fff; padding: 10px 18px; border-radius: 12px; font-weight: 700; display: none; z-index: 10001; max-width: 90vw; text-align: center; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="world"></div></div>
+<div id="hud">
+  <h1>Christina's NYC</h1>
+  <p>Walk with WASD or arrow keys, or tap anywhere. Walk up to a building and press E.</p>
+  <a href="./#/browse">📜 Skip the game: browse all work</a>
+</div>
+<div id="prompt"></div>
+<div id="toast"></div>
+
+<script>
+const WORLD_W = 1920, WORLD_H = 1050;
+const world = document.getElementById('world');
+const stage = document.getElementById('stage');
+const el = (cls, css, parent = world) => { const d = document.createElement('div'); d.className = cls; Object.assign(d.style, css); parent.appendChild(d); return d; };
+const px = (n) => n + 'px';
+
+/* ---------- ground: avenues, streets, lanes, blocks ---------- */
+const AVE = [0, 600, 1200, 1800], AW = 120;
+const ST = [0, 470, 940], SH = 110;
+AVE.forEach(x => el('abs', { left: px(x + AW/2 - 3), top: 0, width: '6px', height: px(WORLD_H), background: 'repeating-linear-gradient(180deg,#f6c453 0 30px,transparent 30px 60px)' }));
+ST.forEach(y => el('abs', { top: px(y + SH/2 - 3), left: 0, width: px(WORLD_W), height: '6px', background: 'repeating-linear-gradient(90deg,#fdf6ec 0 30px,transparent 30px 60px)', opacity: .85 }));
+AVE.forEach(x => ST.forEach(y => el('abs', { left: px(x), top: px(y), width: px(AW), height: px(SH), background: '#5b5566' })));
+
+// crosswalks at the inner intersections
+[1, 2].forEach(i => ST.forEach(y => {
+  const x = AVE[i];
+  const bars = (dir) => `repeating-linear-gradient(${dir},#fdf6ec 0 8px,transparent 8px 18px)`;
+  el('abs', { left: px(x - 40), top: px(y + 4), width: '34px', height: px(SH - 8), background: bars('180deg'), opacity: .85 });
+  el('abs', { left: px(x + AW + 6), top: px(y + 4), width: '34px', height: px(SH - 8), background: bars('180deg'), opacity: .85 });
+  if (y - 40 > 0) el('abs', { left: px(x + 4), top: px(y - 40), width: px(AW - 8), height: '34px', background: bars('90deg'), opacity: .85 });
+  if (y + SH + 6 + 34 < WORLD_H) el('abs', { left: px(x + 4), top: px(y + SH + 6), width: px(AW - 8), height: '34px', background: bars('90deg'), opacity: .85 });
+}));
+
+const COLS = [120, 720, 1320], BW = 480, ROWS = [110, 580], BH = 360;
+ROWS.forEach((by, r) => COLS.forEach((bx, c) => {
+  const park = c === 1 && r === 0;
+  const blk = el('abs', { left: px(bx), top: px(by), width: px(BW), height: px(BH), borderRadius: '16px', background: '#e6dcc8', boxShadow: 'inset 0 0 0 4px #cfc8d6, 0 8px 0 rgba(59,47,58,.28)' });
+  el('abs', { left: '22px', top: '22px', right: '22px', bottom: '22px', borderRadius: '10px', background: park ? '#a5cf9a' : 'repeating-linear-gradient(90deg,transparent 0 59px,rgba(0,0,0,.05) 59px 61px),#efe7d6' }, blk);
+}));
+
+// road names
+el('road-label', { left: '200px', top: px(470 + 12) }).textContent = 'W 42ND ST';
+el('road-label', { left: '1000px', top: px(470 + 74) }).textContent = 'W 42ND ST';
+el('road-label', { left: '380px', top: px(940 + 12) }).textContent = 'W 34TH ST';
+el('road-label', { left: '1450px', top: px(940 + 74) }).textContent = 'W 34TH ST';
+el('road-label', { left: '700px', top: '36px' }).textContent = 'W 57TH ST';
+const vlabel = (x, y, t) => el('road-label v', { left: px(x), top: px(y) }).textContent = t;
+vlabel(600 + 20, 150, 'BROADWAY'); vlabel(600 + 82, 680, 'BROADWAY'); vlabel(1200 + 20, 650, '5TH AVE'); vlabel(1200 + 82, 160, '5TH AVE'); vlabel(40, 600, '8TH AVE');
+
+// painted park: pond + path
+el('abs', { left: '900px', top: '250px', width: '180px', height: '100px', borderRadius: '50%', background: '#7fc4e0', boxShadow: 'inset 0 0 0 4px #3b2f3a, inset 0 -8px 0 rgba(0,0,0,.1)' });
+el('abs', { left: '960px', top: '360px', width: '56px', height: '86px', background: '#e6d3a8', borderRadius: '10px', boxShadow: 'inset 0 0 0 3px #cdb88a' });
+
+/* ---------- entities (y-sorted) ---------- */
+const blockers = [];
+const landmarks = [];
+function ent(src, vbw, vbh, left, bottom, w, opts = {}) {
+  const h = w * vbh / vbw;
+  const d = el('ent', { left: px(left), top: px(bottom - h), width: px(w), height: px(h), zIndex: Math.round(bottom) });
+  const img = document.createElement('img'); img.src = src; img.alt = ''; d.appendChild(img);
+  if (opts.block) blockers.push(opts.block);
+  return { d, left, top: bottom - h, w, h, bottom };
+}
+
+const B = [
+  // name, sub, icon, color, file, vbH, left, bottom, width
+  ['Times Square', 'Games', '🎮', '#e8505b', 'arcade', 260, 250, 440, 230],
+  ['Chelsea', 'Playtesting', '🧪', '#4f9d8f', 'lab', 260, 1450, 440, 230],
+  ['Financial District', 'Data', '📊', '#4c7bd9', 'bank', 260, 250, 910, 230],
+  ['SoHo', 'Design', '🎨', '#e9a23b', 'gallery', 260, 745, 910, 215],
+  ['DUMBO', '3D modeling', '🧊', '#9a6fd1', 'warehouse', 280, 965, 910, 215],
+  ['Midtown', 'Work experience', '💼', '#6b7f94', 'office', 300, 1345, 910, 215],
+  ['The Bodega', 'About me', '🐈', '#2f7d5b', 'bodega', 240, 1565, 910, 205],
+];
+B.forEach(([name, sub, icon, color, file, vbH, left, bottom, w]) => {
+  const e = ent(`art-v3/buildings/${file}.svg`, 282, vbH, left, bottom, w, { block: [left + 6, bottom - 58, left + w - 6, bottom - 4] });
+  const tag = el('tag', { left: px(left + w * 0.45), top: px(e.top - 12), '--c': color });
+  tag.textContent = `${icon} ${name}`;
+  landmarks.push({ name, sub, icon, color, x: left + w * 0.43, y: bottom + 10, node: e.d });
+});
+
+// park trees (v1 art)
+[[770, 220, 100], [1090, 210, 96], [1100, 400, 104], [790, 410, 92], [850, 190, 84], [1040, 170, 84]].forEach(([l, b, w]) => {
+  ent('art/props/tree.svg', 110, 140, l, b + 40, w, { block: [l + w * .4, b + 40 - 16, l + w * .6, b + 40] });
+});
+ent('art/props/bench.svg', 110, 70, 880, 400, 86, { block: [884, 380, 962, 400] });
+ent('art/props/bench.svg', 110, 70, 1030, 400, 86, { block: [1034, 380, 1112, 400] });
+blockers.push([905, 270, 1075, 345]);
+
+// street furniture
+[[165, 456], [585, 456], [745, 456], [1175, 456], [1345, 456], [1765, 456], [165, 926], [585, 926], [1345, 926], [1765, 926]].forEach(([l, b]) =>
+  ent('art/props/streetlamp.svg', 60, 150, l, b, 34, { block: [l + 12, b - 10, l + 22, b] }));
+[[470, 460], [1240, 460], [700, 930], [1500, 930]].forEach(([l, b]) =>
+  ent('art/props/hydrant.svg', 50, 64, l, b, 28, { block: [l + 4, b - 12, l + 24, b] }));
+const subway = ent('art/props/subway-entrance.svg', 140, 150, 1040, 464, 112, { block: [1050, 440, 1142, 464] });
+landmarks.push({ name: 'Subway', sub: 'Fast travel (coming soon)', icon: '🚇', color: '#2f7d5b', x: 1096, y: 480, node: subway.d });
+ent('art/props/hotdog-cart.svg', 120, 110, 830, 466, 88, { block: [836, 446, 910, 466] });
+el('tag', { left: '1096px', top: px(subway.top - 12), '--c': '#2f7d5b' }).textContent = '🚇 Subway';
+
+// manhole steam on the road (top-down art)
+[[360, 500, 54], [1010, 1000, 54]].forEach(([l, t, w]) => { const e = el('ent', { left: px(l), top: px(t - 60), width: px(w), height: px(w * 110 / 90), zIndex: 2 }); const i = document.createElement('img'); i.src = 'art-v2/props/manhole-steam.svg'; e.appendChild(i); });
+
+/* ---------- traffic ---------- */
+const cars = [];
+function car(kind, x, y, speed) {
+  const d = el('ent', { width: '92px', height: '49px', zIndex: 3 });
+  const i = document.createElement('img'); i.src = 'art-v2/props/taxi.svg'; d.appendChild(i);
+  cars.push({ d, kind, x, y, speed });
+}
+car('E', 200, 552, 140); car('E', 1100, 552, 110); car('W', 900, 498, 120); car('W', 1700, 498, 150);
+car('S', 632, 200, 120); car('N', 1288, 800, 130);
+car('E', 300, 1022, 100); car('W', 1500, 968, 120);
+function placeCar(c) {
+  const tf = c.kind === 'W' ? 'scaleX(-1)' : c.kind === 'S' ? 'rotate(90deg)' : c.kind === 'N' ? 'rotate(-90deg)' : '';
+  c.d.style.transform = `translate(${c.x - 46}px, ${c.y - 24}px) ${tf}`;
+  c.d.style.zIndex = Math.round(c.y);
+}
+
+/* ---------- player ---------- */
+const player = { x: 960, y: 520, speed: 230, dir: 'front', moving: false, target: null };
+const pEl = el('ent', { width: '56px', height: '87px' });
+fetch('art-v3/player.svg').then(r => r.text()).then(t => { pEl.innerHTML = t; });
+const keys = new Set();
+const dirKey = { arrowleft: 'a', arrowright: 'd', arrowup: 'w', arrowdown: 's' };
+addEventListener('keydown', e => {
+  const k = (dirKey[e.key.toLowerCase()] || e.key.toLowerCase());
+  if (k === 'e' || k === 'enter') interact();
+  if ('wasd'.includes(k) && k.length === 1) { keys.add(k); e.preventDefault(); }
+});
+addEventListener('keyup', e => keys.delete(dirKey[e.key.toLowerCase()] || e.key.toLowerCase()));
+
+const hit = (x, y) => {
+  const x0 = x - 10, x1 = x + 10, y0 = y - 8, y1 = y;
+  for (const [a, b, c, d] of blockers) if (x1 > a && x0 < c && y1 > b && y0 < d) return true;
+  return false;
+};
+
+/* ---------- camera ---------- */
+let scale = 1, camX = 0, camY = 0;
+function resize() { scale = Math.max(.55, Math.min(1.15, innerWidth / 1100)); }
+addEventListener('resize', resize); resize();
+function camera() {
+  const vw = innerWidth / scale, vh = innerHeight / scale;
+  camX = vw >= WORLD_W ? (WORLD_W - vw) / 2 : Math.max(0, Math.min(WORLD_W - vw, player.x - vw / 2));
+  camY = vh >= WORLD_H ? (WORLD_H - vh) / 2 : Math.max(0, Math.min(WORLD_H - vh, player.y - vh / 2));
+  world.style.transform = `scale(${scale}) translate(${-camX}px, ${-camY}px)`;
+}
+
+/* ---------- tap to move ---------- */
+stage.addEventListener('pointerdown', e => {
+  const wx = e.clientX / scale + camX, wy = e.clientY / scale + camY;
+  player.target = { x: wx, y: wy };
+  el('ripple', { left: px(wx), top: px(wy) });
+  setTimeout(() => world.querySelector('.ripple')?.remove(), 650);
+});
+
+/* ---------- interaction ---------- */
+const promptEl = document.getElementById('prompt'), toast = document.getElementById('toast');
+let nearest = null, toastTimer;
+function showToast(msg) { toast.textContent = msg; toast.style.display = 'block'; clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.style.display = 'none', 3200); }
+function interact() { if (nearest) showToast(`${nearest.icon} ${nearest.name}: the project list for this spot opens here in the next phase.`); }
+promptEl.addEventListener('pointerdown', e => { e.stopPropagation(); interact(); });
+
+/* ---------- main loop ---------- */
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  let dx = (keys.has('d') ? 1 : 0) - (keys.has('a') ? 1 : 0), dy = (keys.has('s') ? 1 : 0) - (keys.has('w') ? 1 : 0);
+  if (dx || dy) player.target = null;
+  else if (player.target) {
+    const tx = player.target.x - player.x, ty = player.target.y - player.y, d = Math.hypot(tx, ty);
+    if (d < 6) player.target = null; else { dx = tx / d; dy = ty / d; }
+  }
+  const len = Math.hypot(dx, dy);
+  player.moving = len > 0;
+  if (player.moving) {
+    dx /= len; dy /= len;
+    const nx = Math.max(16, Math.min(WORLD_W - 16, player.x + dx * player.speed * dt));
+    const ny = Math.max(60, Math.min(WORLD_H - 4, player.y + dy * player.speed * dt));
+    let moved = false;
+    if (!hit(nx, player.y)) { player.x = nx; moved = true; }
+    if (!hit(player.x, ny)) { player.y = ny; moved = true; }
+    if (!moved) player.target = null;
+    player.dir = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'back' : 'front');
+  }
+  pEl.style.left = px(player.x - 28); pEl.style.top = px(player.y - 78); pEl.style.zIndex = Math.round(player.y);
+  const svg = pEl.firstElementChild;
+  if (svg) { svg.dataset.dir = player.dir; svg.classList.toggle('moving', player.moving); }
+
+  cars.forEach(c => {
+    const s = c.speed * dt;
+    if (c.kind === 'E') c.x = (c.x + s > WORLD_W + 120) ? -120 : c.x + s;
+    if (c.kind === 'W') c.x = (c.x - s < -120) ? WORLD_W + 120 : c.x - s;
+    if (c.kind === 'S') c.y = (c.y + s > WORLD_H + 120) ? -120 : c.y + s;
+    if (c.kind === 'N') c.y = (c.y - s < -120) ? WORLD_H + 120 : c.y - s;
+    placeCar(c);
+  });
+
+  nearest = null; let best = 125;
+  landmarks.forEach(l => { const d = Math.hypot(l.x - player.x, l.y - player.y); if (d < best) { best = d; nearest = l; } l.node.classList.remove('near'); });
+  if (nearest) {
+    nearest.node.classList.add('near');
+    promptEl.style.display = 'block'; promptEl.style.setProperty('--c', nearest.color);
+    promptEl.textContent = `${nearest.icon} ${nearest.name} · ${nearest.sub}  (press E or tap)`;
+  } else promptEl.style.display = 'none';
+
+  camera();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

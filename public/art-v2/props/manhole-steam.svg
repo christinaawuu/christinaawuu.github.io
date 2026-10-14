@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 110" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>.p{animation:u 3s ease-out infinite;transform-origin:45px 86px}.p2{animation:u 3s ease-out 1s infinite;transform-origin:45px 86px}.p3{animation:u 3s ease-out 2s infinite;transform-origin:45px 86px}
+@keyframes u{0%{transform:translateY(0) scale(.5);opacity:0}25%{opacity:.9}100%{transform:translateY(-58px) scale(1.4);opacity:0}}</style>
+<circle cx="45" cy="88" r="20" fill="#4a4354"/><circle cx="45" cy="88" r="14" fill="#5b5566" stroke-width="2"/><path d="M33 88h24M45 76v24M36 79l18 18M54 79L36 97" stroke-width="1.5" opacity=".6"/>
+<g stroke="none" fill="#fdf6ec"><circle class="p" cx="45" cy="84" r="12"/><circle class="p2" cx="40" cy="84" r="10"/><circle class="p3" cx="52" cy="84" r="11"/></g>
+</svg>

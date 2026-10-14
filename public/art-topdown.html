@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Top-down art test | Christina Wu</title>
+<style>
+  body { margin: 0; font-family: 'Nunito','Segoe UI',system-ui,sans-serif; background: #fdf6ec; color: #2b2433; }
+  main { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  p { color: #6d6578; margin: 4px 0 14px; }
+  .scene { position: relative; width: 1040px; height: 520px; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    background:
+      /* road */ linear-gradient(#5b5566, #5b5566) 0 400px / 100% 120px no-repeat,
+      /* road center dash */ repeating-linear-gradient(90deg, #f6c453 0 34px, transparent 34px 68px) 0 456px / 100% 6px no-repeat,
+      /* curb */ linear-gradient(#cfc8d6, #cfc8d6) 0 392px / 100% 8px no-repeat,
+      /* sidewalk tiles */ repeating-linear-gradient(90deg, transparent 0 59px, rgba(0,0,0,.07) 59px 61px) 0 300px / 100% 92px no-repeat,
+      linear-gradient(#e6dcc8, #e6dcc8) 0 300px / 100% 92px no-repeat,
+      #a5cf9a; }
+  .scene img { position: absolute; }
+  .b { width: 140px; }
+  .cross { position: absolute; top: 400px; height: 120px; width: 70px; background: repeating-linear-gradient(#fdf6ec 0 9px, transparent 9px 20px); opacity: .85; }
+  @keyframes drive { from { transform: translateX(-180px); } to { transform: translateX(1100px); } }
+  @keyframes walk { 0%,100% { transform: translateX(0); } 50% { transform: translateX(150px); } }
+  .taxi { top: 410px; width: 110px; animation: drive 9s linear infinite; }
+  .player { top: 322px; width: 40px; animation: walk 6s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<main>
+  <h2>Top-down test</h2>
+  <p>Same neighborhoods, drawn from a high angle: rooftops, front walls with depth, cast shadows, and a street. Compare with <a href="art-kit.html">the first style</a>.</p>
+  <div class="scene">
+    <img class="b" style="left:6px; top:170px" src="art-v2/buildings/arcade.svg" alt="Times Square" />
+    <img class="b" style="left:152px; top:170px" src="art-v2/buildings/lab.svg" alt="Chelsea" />
+    <img class="b" style="left:298px; top:170px" src="art-v2/buildings/bank.svg" alt="Financial District" />
+    <img class="b" style="left:444px; top:170px" src="art-v2/buildings/gallery.svg" alt="SoHo" />
+    <img class="b" style="left:590px; top:170px" src="art-v2/buildings/warehouse.svg" alt="DUMBO" />
+    <img class="b" style="left:736px; top:170px" src="art-v2/buildings/office.svg" alt="Midtown" />
+    <img class="b" style="left:882px; top:170px" src="art-v2/buildings/bodega.svg" alt="Bodega" />
+    <img src="art-v2/props/tree.svg" style="left:10px; top:60px; width:100px" alt="" />
+    <img src="art-v2/props/tree.svg" style="left:430px; top:36px; width:84px" alt="" />
+    <img src="art-v2/props/tree.svg" style="left:840px; top:56px; width:96px" alt="" />
+    <img src="art-v2/props/streetlamp.svg" style="left:290px; top:318px; width:50px" alt="" />
+    <img src="art-v2/props/streetlamp.svg" style="left:730px; top:318px; width:50px" alt="" />
+    <img src="art-v2/props/hydrant.svg" style="left:560px; top:330px; width:36px" alt="" />
+    <img src="art-v2/props/manhole-steam.svg" style="left:640px; top:340px; width:70px" alt="" />
+    <div class="cross" style="left:900px"></div>
+    <img class="taxi" src="art-v2/props/taxi.svg" alt="" />
+    <img class="player" style="left:60px" src="art-v2/characters/player.svg" alt="" />
+  </div>
+</main>
+</body>
+</html>
