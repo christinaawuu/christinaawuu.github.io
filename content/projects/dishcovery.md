@@ -1,11 +1,18 @@
 ---
 title: Dishcovery
-category: games   # TODO: confirm the category
+category: design   # TODO: becomes "apps" once that neighborhood exists
 date: "2025-04"
 dateLabel: "Apr - May 2025"
-summary: TODO describe this project in one sentence.
-tags: []
-draft: true   # TODO: set to false once the details are filled in
+summary: An iOS app that serves real-time recipe videos from the YouTube Data API.
+tags: [Swift, SwiftUI, UIKit, Firebase Firestore, YouTube API]
+draft: true   # TODO: set to false once the category is decided and you add screenshots
+links:
+  - label: GitHub
+    url: https://github.com/christinaawuu/Dishcovery
 ---
 
-TODO: what it is, your role, tools used, and any links, images, or videos.
+- Built an iOS app integrating the YouTube Data API, UIKit, and SwiftUI to serve 10+ real-time recipe videos per query.
+- Used URLSession to fetch and parse JSON asynchronously, with load times under 1.5 seconds.
+- Applied CI/CD practices and added RESTful API logging with Xcode tools, then optimized response time through iterative debugging and performance monitoring.
+
+TODO: add app screenshots or a screen recording.
