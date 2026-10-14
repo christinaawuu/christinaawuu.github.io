@@ -1,11 +1,11 @@
 ---
 title: Dishcovery
-category: design   # TODO: becomes "apps" once that neighborhood exists
+category: apps
 date: "2025-04"
 dateLabel: "Apr - May 2025"
 summary: An iOS app that serves real-time recipe videos from the YouTube Data API.
 tags: [Swift, SwiftUI, UIKit, Firebase Firestore, YouTube API]
-draft: true   # TODO: set to false once the category is decided and you add screenshots
+draft: true   # TODO: set to false once you add screenshots
 links:
   - label: GitHub
     url: https://github.com/christinaawuu/Dishcovery

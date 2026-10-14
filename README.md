@@ -1,4 +1,4 @@
-# Christina Wu: NYC Portfolio
+﻿# Christina Wu: NYC Portfolio
 
 An interactive, Stardew-style New York portfolio. Work lives in `content/projects/*.md`.
 
@@ -10,13 +10,17 @@ An interactive, Stardew-style New York portfolio. Work lives in `content/project
 
 To remove work, delete the file or set `draft: true`. Images go in `public/images/`.
 
-| category | neighborhood |
-|---|---|
-| games | Times Square |
-| playtesting | Chelsea |
-| data | Financial District |
-| design | SoHo |
-| modeling | DUMBO |
+| category | neighborhood | holds |
+|---|---|---|
+| games | Times Square | Games |
+| playtesting | Chelsea | Professional playtests |
+| engineering | Financial District | Software engineering and data |
+| apps | Flatiron | iOS apps and websites |
+| modeling | DUMBO | Maya modeling, rendering, animation |
+| design | SoHo | Design and marketing |
+| experience | Midtown | Jobs |
+| involvement | Union Square | Leadership and community |
+| spots | My Spots | Hobbies and favorite places |
 
 ## Run locally
 

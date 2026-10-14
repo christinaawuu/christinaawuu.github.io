@@ -1,4 +1,4 @@
-﻿---
+---
 title: Twist Tile Golf Level Design
 category: design
 date: "2025-01"

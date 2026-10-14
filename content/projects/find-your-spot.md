@@ -1,11 +1,11 @@
 ---
 title: Find Your Spot
-category: design   # TODO: becomes "web" once that neighborhood exists
+category: apps
 date: "2024-02"
 dateLabel: "Feb - May 2024"
 summary: A full-stack website with user accounts and a guest-to-member flow that raised sign-ups by 25%.
 tags: [Java, HTML, CSS, Firebase, Multithreading]
-draft: true   # TODO: set to false once the category is decided and you add screenshots
+draft: true   # TODO: set to false once you add screenshots
 links:
   - label: Live site
     url: https://findyourspot.netlify.app

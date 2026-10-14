@@ -7,6 +7,14 @@ export interface ProjectLink {
   url: string;
 }
 
+export type Surface = 'world' | 'career';
+
+export interface Media {
+  type: 'image' | 'video' | 'youtube';
+  src: string;
+  caption?: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -18,6 +26,9 @@ export interface Project {
   cover?: string;
   featured: boolean;
   links: ProjectLink[];
+  media: Media[];
+  /** where this entry appears: the walkable world, the career page, or both (default) */
+  showIn: Surface[];
   body: string;
 }
 
@@ -41,7 +52,7 @@ function toProject(path: string, raw: string): Project | null {
   const slug = path.split('/').pop()!.replace(/\.md$/, '');
   if (slug.startsWith('_')) return null;
 
-  const match = FRONTMATTER.exec(raw);
+  const match = FRONTMATTER.exec(raw.replace(/^﻿/, ''));
   if (!match) {
     console.warn(`[content] ${slug}: missing frontmatter, skipped`);
     return null;
@@ -62,6 +73,13 @@ function toProject(path: string, raw: string): Project | null {
     ? (data.links as ProjectLink[]).filter((l) => l?.label && l?.url)
     : [];
 
+  const media = Array.isArray(data.media)
+    ? (data.media as Media[]).filter((m) => m?.src && ['image', 'video', 'youtube'].includes(m.type))
+    : [];
+  const showIn = Array.isArray(data.showIn)
+    ? (data.showIn as string[]).filter((s): s is Surface => s === 'world' || s === 'career')
+    : [];
+
   return {
     slug,
     title: data.title,
@@ -73,6 +91,8 @@ function toProject(path: string, raw: string): Project | null {
     cover: typeof data.cover === 'string' ? data.cover : undefined,
     featured: data.featured === true,
     links,
+    media,
+    showIn: showIn.length ? showIn : ['world', 'career'],
     body: match[2].trim(),
   };
 }

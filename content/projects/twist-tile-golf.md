@@ -1,4 +1,4 @@
-﻿---
+---
 title: Twist Tile Golf
 category: games
 date: "2025-01"

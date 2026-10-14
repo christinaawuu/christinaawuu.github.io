@@ -1,6 +1,6 @@
 import './style.css';
 import { marked } from 'marked';
-import { projects, siteInfo, type Project } from './content';
+import { projects, siteInfo, type Media, type Project } from './content';
 import { NEIGHBORHOODS, neighborhoodFor, type Category } from './neighborhoods';
 
 type View = 'explore' | 'browse';
@@ -62,11 +62,12 @@ function card(p: Project): string {
 function renderBrowse(): string {
   const chip = (value: Category | 'all', label: string) =>
     `<button class="chip${filter === value ? ' active' : ''}" data-filter="${value}">${label}</button>`;
-  const shown = projects.filter((p) => filter === 'all' || p.category === filter);
+  const careerItems = projects.filter((p) => p.showIn.includes('career'));
+  const shown = careerItems.filter((p) => filter === 'all' || p.category === filter);
   return `
     <section class="filters" aria-label="Filter by neighborhood">
       ${chip('all', 'All')}
-      ${NEIGHBORHOODS.filter((n) => projects.some((p) => p.category === n.category))
+      ${NEIGHBORHOODS.filter((n) => careerItems.some((p) => p.category === n.category))
         .map((n) => chip(n.category, `${n.icon} ${esc(n.name)}`))
         .join('')}
     </section>
@@ -85,6 +86,14 @@ function renderExplore(): string {
     </section>`;
 }
 
+function mediaHtml(m: Media): string {
+  const cap = m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : '';
+  if (m.type === 'image') return `<figure class="media-item"><img src="${esc(asset(m.src))}" alt="${esc(m.caption ?? '')}" loading="lazy" />${cap}</figure>`;
+  if (m.type === 'video') return `<figure class="media-item"><video src="${esc(asset(m.src))}" controls preload="none" playsinline></video>${cap}</figure>`;
+  const id = encodeURIComponent(m.src);
+  return `<figure class="media-item"><iframe src="https://www.youtube-nocookie.com/embed/${id}" loading="lazy" title="${esc(m.caption ?? 'Video')}" allowfullscreen></iframe>${cap}</figure>`;
+}
+
 function openProject(slug: string): void {
   const p = projects.find((x) => x.slug === slug);
   if (!p) return;
@@ -100,6 +109,7 @@ function openProject(slug: string): void {
     <ul class="tags">${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
     ${p.cover ? `<img class="hero" src="${esc(asset(p.cover))}" alt="" />` : ''}
     <div class="body">${marked.parse(p.body, { async: false })}</div>
+    ${p.media.map(mediaHtml).join('')}
     <div class="links">${p.links
       .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`)
       .join('')}</div>`;

@@ -12,3 +12,4 @@ featured: true
 - Built a cone-based random launch-velocity generator with vector math, enabling scattered loot drops with tunable angle and speed ranges.
 - Collaborated with 10+ engineers across 2-week Agile sprints and biweekly standups.
 - Eliminated 3 recurring production bugs by rebuilding core gameplay logic.
+- Partnered with designers to define technical specifications and delivered a debug menu that operates independently.
