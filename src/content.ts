@@ -18,7 +18,10 @@ export interface Media {
 export interface Project {
   slug: string;
   title: string;
+  /** primary category: decides the neighborhood in the world */
   category: Category;
+  /** every category it shows under on the career page (primary first, then `alsoIn`) */
+  categories: Category[];
   date: string;
   dateLabel?: string;
   summary: string;
@@ -32,11 +35,20 @@ export interface Project {
   body: string;
 }
 
-export const siteInfo = site as {
+export interface SiteInfo {
   name: string;
   tagline: string;
+  headline: string;
+  roles: string;
+  intro: string;
+  /** optional photo in public/, e.g. "images/christina.jpg" */
+  photo?: string;
   links: ProjectLink[];
-};
+  stats: { value: number; suffix?: string; label: string }[];
+  skills: { group: string; items: string[] }[];
+  resumes?: ProjectLink[];
+}
+export const siteInfo = site as SiteInfo;
 
 // Every markdown file in content/projects is bundled at build time. This is the "database".
 const files = import.meta.glob('/content/projects/*.md', {
@@ -72,6 +84,10 @@ function toProject(path: string, raw: string): Project | null {
     return null;
   }
 
+  const alsoIn = Array.isArray(data.alsoIn)
+    ? (data.alsoIn as unknown[]).map(String).filter((c) => CATEGORIES.has(c) && c !== data.category)
+    : [];
+
   const links = Array.isArray(data.links)
     ? (data.links as ProjectLink[]).filter((l) => l?.label && l?.url)
     : [];
@@ -87,6 +103,7 @@ function toProject(path: string, raw: string): Project | null {
     slug,
     title: data.title,
     category: data.category as Category,
+    categories: [data.category as Category, ...(alsoIn as Category[])],
     date: String(data.date ?? ''),
     dateLabel: typeof data.dateLabel === 'string' ? data.dateLabel : undefined,
     summary: String(data.summary ?? ''),

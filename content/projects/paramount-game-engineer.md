@@ -6,6 +6,7 @@ dateLabel: "Jun 2026 - Present"
 summary: Unreal Engine C++ gameplay engineering with a team of 10+ engineers in Manhattan.
 tags: [Unreal Engine, C++, Agile]
 featured: true
+alsoIn: [engineering, games]
 ---
 
 - Architected an Unreal C++ item-drop system, consolidating 5 legacy functions into 3 while preserving object-oriented design.

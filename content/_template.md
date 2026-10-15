@@ -3,6 +3,7 @@
 # and fill it in. Files starting with "_" or with draft: true are not shown.
 title: Project name
 category: games        # games | playtesting | engineering | apps | modeling | design | experience | involvement | spots
+alsoIn: [engineering]  # optional: other career-page categories it also shows under
 date: "2026-01"        # YYYY or YYYY-MM, used for sorting (newest first)
 dateLabel: "Jan 2026 - Present"   # optional, shown instead of the formatted date
 summary: One sentence shown on the card.

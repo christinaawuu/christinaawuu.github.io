@@ -1,4 +1,6 @@
-﻿# Christina Wu: NYC Portfolio
+# Christina Wu: NYC Portfolio
+
+See **CONTENT_GUIDE.md** for how to add and edit projects from any device.
 
 An interactive, Stardew-style New York portfolio. Work lives in `content/projects/*.md`.
 

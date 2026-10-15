@@ -1,9 +1,25 @@
 {
   "name": "Christina Wu",
   "tagline": "Game developer, playtester, and producer. Welcome to my city.",
+  "headline": "I build games, and the teams and systems behind them.",
+  "roles": "Game Developer · Software Engineer · Producer",
+  "intro": "I'm a Junior Game Engineer intern at Paramount Skydance Games in Manhattan, where I write gameplay systems in Unreal Engine C++. I also run playtests, build apps and websites, and keep cross-functional teams moving.",
+  "photo": "",
   "links": [
     { "label": "GitHub", "url": "https://github.com/christinaawuu" },
     { "label": "LinkedIn", "url": "https://linkedin.com/in/christina-wu1" },
     { "label": "itch.io", "url": "https://christinawu.itch.io" }
-  ]
+  ],
+  "stats": [
+    { "value": 50, "suffix": "+", "label": "playtesting sessions directed" },
+    { "value": 30, "suffix": "+", "label": "engineers coordinated as a producer" },
+    { "value": 300, "suffix": "K+", "label": "dollars of donations enabled by a platform I built" },
+    { "value": 12, "label": "puzzle levels co-designed for Twist Tile Golf" }
+  ],
+  "skills": [
+    { "group": "Languages", "items": ["C++", "C#", "Python", "Java", "JavaScript", "Swift", "SQL", "HTML/CSS", "Unreal Blueprints"] },
+    { "group": "Engines & frameworks", "items": ["Unreal Engine", "Unity", "React", "Next.js", "Firebase", "AWS", "Node.js"] },
+    { "group": "Tools", "items": ["Perforce", "Git", "Jira", "ClickUp", "Xcode", "Docker", "Maya", "Figma"] }
+  ],
+  "resumes": []
 }
