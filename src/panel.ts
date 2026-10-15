@@ -11,9 +11,15 @@ function mediaHtml(m: Media): string {
   return `<figure class="media-item"><iframe src="https://www.youtube-nocookie.com/embed/${id}" loading="lazy" title="${esc(m.caption ?? 'Video')}" allowfullscreen></iframe>${cap}</figure>`;
 }
 
-/** Open a project in a modal panel. Used by the career page and the world. */
-export function openProject(p: Project): void {
+/**
+ * Open a project in a modal panel. On the career page every category shows its neighborhood as a tag. Opened from the map, the card
+ * shows only the neighborhood you are standing in, and its other categories appear as separate overlap tags.
+ */
+export function openProject(p: Project, from: 'career' | 'world' = 'career'): void {
   const n = neighborhoodFor(p.category);
+  const placeTags = from === 'world'
+    ? `<li class="place">📍 ${esc(n.name)}</li>${p.categories.slice(1).map((c) => `<li class="overlap" style="--oc:${neighborhoodFor(c).color}">${neighborhoodFor(c).icon} ${esc(neighborhoodFor(c).label)}</li>`).join('')}`
+    : p.categories.map((c) => `<li class="place">📍 ${esc(neighborhoodFor(c).name)}</li>`).join('');
   const dialog = document.createElement('dialog');
   dialog.className = 'panel';
   dialog.style.setProperty('--accent', n.color);
@@ -22,7 +28,7 @@ export function openProject(p: Project): void {
     <span class="badge">${n.icon} ${esc(n.label)}</span>
     <span class="date">${esc(formatDate(p))}</span>
     <h2>${esc(p.title)}</h2>
-    <ul class="tags">${p.categories.map((c) => `<li class="place">📍 ${esc(neighborhoodFor(c).name)}</li>`).join('')}${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+    <ul class="tags">${placeTags}${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
     ${p.cover ? `<img class="hero" src="${esc(asset(p.cover))}" alt="" />` : ''}
     <div class="body">${marked.parse(p.body, { async: false })}</div>
     ${p.media.map(mediaHtml).join('')}

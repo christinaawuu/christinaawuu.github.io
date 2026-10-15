@@ -202,3 +202,5 @@ body.night .cloud { opacity: .35; }
 
 .torch { animation: torch 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
 @keyframes torch { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12, 1.18); } }
+
+.tags li.overlap { background: color-mix(in srgb, var(--oc, #999) 20%, white); border: 1.5px dashed var(--oc, #999); font-weight: 700; }

@@ -95,7 +95,7 @@ function route(): void {
   const cat = /^#\/explore\/(\w+)/.exec(hash)?.[1] as Category | undefined;
   city ??= createCity(worldRoot, {
     enter: (c) => { location.hash = `#/explore/${c}`; },
-    open: (entry) => openProject(entry),
+    open: (entry) => openProject(entry, 'world'),
     toast,
   });
 
@@ -105,7 +105,7 @@ function route(): void {
     sceneCategory = cat;
     scene = createScene(worldRoot, cat, {
       exit: () => { location.hash = '#/explore'; },
-      open: (entry) => openProject(entry),
+      open: (entry) => openProject(entry, 'world'),
       sign: (info) => openSign(info),
     });
     renderHud('scene', cat);
