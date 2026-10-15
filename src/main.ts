@@ -24,6 +24,7 @@ let scene: SceneHandle | null = null;
 let sceneCategory: Category | null = null;
 let toastTimer = 0;
 let careerCleanup: (() => void) | null = null;
+let hideTimer = 0; // hides the map once a neighborhood has faded in over it
 
 // day / night: follows the visitor's clock until they press the toggle
 const saved = localStorage.getItem('theme');
@@ -80,6 +81,7 @@ function route(): void {
 
   careerCleanup?.();
   careerCleanup = null;
+  if (!hash.startsWith('#/explore/')) clearTimeout(hideTimer);
   if (hash.startsWith('#/career')) {
     stopScene();
     show('career');
@@ -107,10 +109,13 @@ function route(): void {
       sign: (info) => openSign(info),
     });
     renderHud('scene', cat);
-    window.setTimeout(() => city?.hide(), 1100); // the scene fades in over the map, which keeps gliding underneath
+    // the scene fades in over the map, which keeps gliding underneath; only hide the map if we are still inside
+    clearTimeout(hideTimer);
+    hideTimer = window.setTimeout(() => { if (scene) city?.hide(); }, 1100);
     return;
   }
 
+  clearTimeout(hideTimer); // a late timer must never hide the map we are returning to
   const from = sceneCategory ?? undefined;
   stopScene(true); // fade out while the map zooms back out
   sceneCategory = null;
