@@ -418,7 +418,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   function apply(): void {
     cam.setAttribute('transform', `translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${s.toFixed(4)})`);
     wrap.classList.toggle('zoomed', s >= fit * 2.2);
-    wrap.classList.toggle('zoomed-far', s >= fit * 4);
+    wrap.classList.toggle('city-far', s >= fit * 4);
     const k = 1 / s;
     for (const l of labels) l.setAttribute('transform', `scale(${k.toFixed(4)}) translate(0 ${-Number(l.dataset.off)})`);
   }
