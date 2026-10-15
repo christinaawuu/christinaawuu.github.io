@@ -1,5 +1,5 @@
-import { about, projects, worldEntries, type Project } from '../content';
-import { HOME_LL, NEIGHBORHOODS, SPOT_POS, neighborhoodFor, type Category } from '../neighborhoods';
+import { about, worldEntries, type Project } from '../content';
+import { HOME_LL, NEIGHBORHOODS, neighborhoodFor, type Category } from '../neighborhoods';
 import { esc } from '../util';
 import { BOROUGH_PATHS, BOROUGH_RINGS, GEO } from './nycGeo';
 
@@ -87,13 +87,11 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   root.appendChild(wrap);
 
   /* ---------- beacons and pins ---------- */
-  const beacons: Beacon[] = NEIGHBORHOODS.filter((n) => n.category !== 'spots').map((n) => ({
+  const beacons: Beacon[] = NEIGHBORHOODS.map((n) => ({
     category: n.category, ...xy(n.ll), live: worldEntries(n.category).length > 0,
   }));
-  const pins = Object.entries(SPOT_POS)
-    .map(([slug, pos]) => ({ slug, entry: projects.find((p) => p.slug === slug), pos }))
-    .filter((p) => p.entry && p.entry.showIn.includes('world'))
-    .map((p) => ({ ...p, ...xy(p.pos.ll) }));
+  // hobby spots now live inside the Brooklyn neighborhood; only the About me pin sits on the map
+  const pins: { slug: string; entry?: Project; x: number; y: number; pos: { icon: string } }[] = [];
   const home = about ? { entry: about, ...xy(HOME_LL) } : null;
   const keepClear: P[] = [...beacons, ...pins, ...(home ? [home] : [])];
 

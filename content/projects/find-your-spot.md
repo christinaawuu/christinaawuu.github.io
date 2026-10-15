@@ -1,11 +1,11 @@
 ---
 title: Find Your Spot
 category: apps
+alsoIn: [engineering]
 date: "2024-02"
 dateLabel: "Feb - May 2024"
 summary: A full-stack website with user accounts and a guest-to-member flow that raised sign-ups by 25%.
 tags: [Java, HTML, CSS, Firebase, Multithreading]
-draft: true   # TODO: set to false once you add screenshots
 links:
   - label: Live site
     url: https://findyourspot.netlify.app
@@ -15,4 +15,3 @@ links:
 - Co-developed the UI and backend APIs, enabling 50+ user-generated posts.
 - Optimized the guest-to-user conversion flow, increasing sign-ups by 25% through improved UX design.
 
-TODO: add screenshots.

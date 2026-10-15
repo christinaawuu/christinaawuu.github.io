@@ -1,6 +1,7 @@
 ---
 title: Twist Tile Golf Telemetry
 category: engineering
+alsoIn: [games, playtesting]
 date: "2025-01"
 dateLabel: "Jan - May 2025"
 summary: Used Firebase analytics from 30+ playtests to find flow bottlenecks and guide UX fixes.

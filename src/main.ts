@@ -3,7 +3,7 @@ import './career.css';
 import { renderCareer } from './career';
 import { siteInfo, worldEntries } from './content';
 import { NEIGHBORHOODS, neighborhoodFor, type Category } from './neighborhoods';
-import { openProject } from './panel';
+import { openProject, openSign } from './panel';
 import { esc } from './util';
 import { createCity, type CityHandle } from './world/city';
 import { createScene, type SceneHandle } from './world/scene';
@@ -92,6 +92,7 @@ function route(): void {
     scene = createScene(worldRoot, cat, {
       exit: () => { location.hash = '#/explore'; },
       open: (entry) => openProject(entry),
+      sign: (info) => openSign(info),
     });
     renderHud('scene', cat);
     window.setTimeout(() => city?.hide(), 450); // the scene fades in over the map

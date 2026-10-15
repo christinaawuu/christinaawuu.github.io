@@ -1,6 +1,7 @@
 ---
 title: Twist Tile Golf Level Design
 category: design
+alsoIn: [games]
 date: "2025-01"
 dateLabel: "Jan - May 2025"
 summary: Collaborated on 12 one-shot golf puzzle levels with steadily rising complexity.

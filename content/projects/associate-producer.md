@@ -1,6 +1,7 @@
 ---
 title: Associate Producer, Unchained
 category: experience
+alsoIn: [games]
 date: "2024-08"
 dateLabel: "Aug 2024 - May 2025"
 summary: Technical liaison between about 30 engineers and 8 cross-functional groups.

@@ -32,6 +32,14 @@ export interface Project {
   media: Media[];
   /** where this entry appears: the walkable world, the career page, or both (default) */
   showIn: Surface[];
+  /** world only: which building sprite to use instead of the neighborhood default (e.g. gym, pizza) */
+  building?: string;
+  /** world only: draw a standalone prop (bike-rack, picnic, bridge) instead of a building */
+  prop?: string;
+  /** world only: park-style green lot */
+  park?: boolean;
+  /** world only: a small interaction, e.g. "bike", "reps", "photo", "snack:🍕" */
+  action?: string;
   body: string;
 }
 
@@ -47,6 +55,7 @@ export interface SiteInfo {
   stats: { value: number; suffix?: string; label: string }[];
   skills: { group: string; items: string[] }[];
   resumes?: ProjectLink[];
+  education?: { school: string; degree: string; years: string; awards: string[] };
 }
 export const siteInfo = site as SiteInfo;
 
@@ -114,6 +123,10 @@ function toProject(path: string, raw: string): Project | null {
     media,
     // hobby spots live in the world only unless the entry says otherwise
     showIn: showIn.length ? showIn : data.category === 'spots' ? ['world'] : ['world', 'career'],
+    building: typeof data.building === 'string' ? data.building : undefined,
+    prop: typeof data.prop === 'string' ? data.prop : undefined,
+    park: data.park === true,
+    action: typeof data.action === 'string' ? data.action : undefined,
     body: match[2].trim(),
   };
 }
@@ -136,6 +149,22 @@ export const about: Project | null =
 export const bySlug = (slug: string): Project | undefined =>
   projects.find((p) => p.slug === slug) ?? (about?.slug === slug ? about : undefined);
 
-/** Entries shown in a neighborhood scene. */
-export const worldEntries = (category: Category): Project[] =>
-  projects.filter((p) => p.category === category && p.showIn.includes('world'));
+/** Entries shown in a neighborhood scene. Brooklyn also holds the "About me" entry first. */
+export const worldEntries = (category: Category): Project[] => {
+  const list = projects.filter((p) => p.category === category && p.showIn.includes('world'));
+  return category === 'spots' && about ? [about, ...list] : list;
+};
+
+// content/neighborhoods/<category>.md: the sign at the entrance of each neighborhood.
+export interface SignInfo { category: Category; title: string; body: string; picks: { name: string; note?: string }[] }
+const signFiles = import.meta.glob('/content/neighborhoods/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const signs = new Map<string, SignInfo>();
+for (const raw of Object.values(signFiles)) {
+  const m = FRONTMATTER.exec(raw.replace(/^﻿/, ''));
+  if (!m) continue;
+  const d = (parse(m[1]) ?? {}) as Record<string, unknown>;
+  if (typeof d.category !== 'string' || !CATEGORIES.has(d.category)) continue;
+  const picks = Array.isArray(d.picks) ? (d.picks as { name?: unknown; note?: unknown }[]).filter((x) => x?.name).map((x) => ({ name: String(x.name), note: x.note ? String(x.note) : undefined })) : [];
+  signs.set(d.category, { category: d.category as Category, title: String(d.title ?? ''), body: m[2].trim(), picks });
+}
+export const signFor = (category: Category): SignInfo | undefined => signs.get(category);

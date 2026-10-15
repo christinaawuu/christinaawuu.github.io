@@ -1,25 +1,96 @@
 {
   "name": "Christina Wu",
   "tagline": "Game developer, playtester, and producer. Welcome to my city.",
-  "headline": "I build games, and the teams and systems behind them.",
+  "headline": "I build games, and the people and systems behind them.",
   "roles": "Game Developer · Software Engineer · Producer",
-  "intro": "I'm a Junior Game Engineer intern at Paramount Skydance Games in Manhattan, where I write gameplay systems in Unreal Engine C++. I also run playtests, build apps and websites, and keep cross-functional teams moving.",
-  "photo": "",
+  "intro": "I'm a game developer and software engineer from Brooklyn with a computer science degree from USC. I build gameplay systems, run playtests, and make apps, websites, and 3D art. I like working where design and engineering meet.",
+  "photo": "images/christina.jpg",
   "links": [
-    { "label": "GitHub", "url": "https://github.com/christinaawuu" },
-    { "label": "LinkedIn", "url": "https://linkedin.com/in/christina-wu1" },
-    { "label": "itch.io", "url": "https://christinawu.itch.io" }
+    {
+      "label": "GitHub",
+      "url": "https://github.com/christinaawuu"
+    },
+    {
+      "label": "LinkedIn",
+      "url": "https://linkedin.com/in/christina-wu1"
+    },
+    {
+      "label": "itch.io",
+      "url": "https://christinawu.itch.io"
+    }
   ],
   "stats": [
-    { "value": 50, "suffix": "+", "label": "playtesting sessions directed" },
-    { "value": 30, "suffix": "+", "label": "engineers coordinated as a producer" },
-    { "value": 300, "suffix": "K+", "label": "dollars of donations enabled by a platform I built" },
-    { "value": 12, "label": "puzzle levels co-designed for Twist Tile Golf" }
+    {
+      "value": 50,
+      "suffix": "+",
+      "label": "playtesting sessions directed"
+    },
+    {
+      "value": 30,
+      "suffix": "+",
+      "label": "engineers coordinated as a producer"
+    },
+    {
+      "value": 300,
+      "suffix": "K+",
+      "label": "dollars of donations enabled by a platform I built"
+    },
+    {
+      "value": 12,
+      "label": "puzzle levels co-designed for Twist Tile Golf"
+    }
   ],
   "skills": [
-    { "group": "Languages", "items": ["C++", "C#", "Python", "Java", "JavaScript", "Swift", "SQL", "HTML/CSS", "Unreal Blueprints"] },
-    { "group": "Engines & frameworks", "items": ["Unreal Engine", "Unity", "React", "Next.js", "Firebase", "AWS", "Node.js"] },
-    { "group": "Tools", "items": ["Perforce", "Git", "Jira", "ClickUp", "Xcode", "Docker", "Maya", "Figma"] }
+    {
+      "group": "Languages",
+      "items": [
+        "C++",
+        "C#",
+        "Python",
+        "Java",
+        "JavaScript",
+        "Swift",
+        "SQL",
+        "HTML/CSS",
+        "Unreal Blueprints"
+      ]
+    },
+    {
+      "group": "Engines & frameworks",
+      "items": [
+        "Unreal Engine",
+        "Unity",
+        "React",
+        "Next.js",
+        "Firebase",
+        "AWS",
+        "Node.js"
+      ]
+    },
+    {
+      "group": "Tools",
+      "items": [
+        "Perforce",
+        "Git",
+        "Jira",
+        "ClickUp",
+        "Xcode",
+        "Docker",
+        "Maya",
+        "Figma"
+      ]
+    }
   ],
-  "resumes": []
+  "resumes": [],
+  "education": {
+    "school": "University of Southern California",
+    "degree": "B.S. in Computer Science (Games)",
+    "years": "2021 - 2025",
+    "awards": [
+      "Dean's List",
+      "QuestBridge Finalist",
+      "Grace Hopper Celebration Scholarship",
+      "Viterbi Fall Lead Scholarship"
+    ]
+  }
 }

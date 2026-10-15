@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 240" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>.sway{animation:sw 5s ease-in-out infinite;transform-origin:170px 40px}@keyframes sw{0%,100%{transform:skewX(-.6deg)}50%{transform:skewX(.6deg)}}</style>
+<ellipse cx="170" cy="226" rx="150" ry="10" fill="#3b2f3a" opacity=".18" stroke="none"/>
+<!-- cables -->
+<g class="sway" stroke="#6d6578" stroke-width="2.5"><path d="M150 40L8 150M150 56L28 150M150 72L48 150M190 40l142 110M190 56l122 94M190 72l102 78M150 40V8M190 40V8"/></g>
+<path d="M0 156h340v14H0z" fill="#d9d3c4"/>
+<!-- tower -->
+<path d="M128 40V8l14-6h56l14 6v32z" fill="#a8977c"/>
+<rect x="124" y="40" width="92" height="186" rx="4" fill="#b8a58a"/>
+<path d="M124 100h92M124 40h92" stroke-width="2" opacity=".5"/>
+<path d="M136 226V120a22 40 0 0144 0v106z" fill="#3b3547"/>
+<path d="M184 226V120a22 40 0 0144 0v106z" fill="#3b3547" transform="translate(-4 0)"/>
+<path d="M132 226V120a18 30 0 0136 0v106zM172 226V120a18 30 0 0136 0v106z" fill="#ffd9a0" opacity=".55" stroke="none"/>
+<g stroke-width="2"><path d="M140 70h16M184 70h16" opacity=".6"/></g>
+<rect x="104" y="214" width="132" height="12" rx="4" fill="#cdbf9f"/>
+</svg>

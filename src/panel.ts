@@ -1,5 +1,5 @@
 import { marked } from 'marked';
-import type { Media, Project } from './content';
+import type { Media, Project, SignInfo } from './content';
 import { neighborhoodFor } from './neighborhoods';
 import { asset, esc, formatDate } from './util';
 
@@ -29,6 +29,26 @@ export function openProject(p: Project): void {
     <div class="links">${p.links
       .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`)
       .join('')}</div>`;
+  dialog.addEventListener('close', () => dialog.remove());
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog || (e.target as HTMLElement).closest('.close')) dialog.close();
+  });
+  document.body.appendChild(dialog);
+  dialog.showModal();
+}
+
+/** The neighborhood guide sign: what this neighborhood is, plus my recommendations when I have added them. */
+export function openSign(info: SignInfo): void {
+  const n = neighborhoodFor(info.category);
+  const dialog = document.createElement('dialog');
+  dialog.className = 'panel sign-panel';
+  dialog.style.setProperty('--accent', n.color);
+  dialog.innerHTML = `
+    <button class="close" aria-label="Close">×</button>
+    <span class="badge">${n.icon} ${esc(n.name)} · ${esc(n.label)}</span>
+    <h2>${esc(info.title || n.name)}</h2>
+    <div class="body">${marked.parse(info.body, { async: false })}</div>
+    ${info.picks.length ? `<h3 class="picks-h">📍 My picks</h3><ul class="picks">${info.picks.map((p) => `<li><b>${esc(p.name)}</b>${p.note ? `<span>${esc(p.note)}</span>` : ''}</li>`).join('')}</ul>` : ''}`;
   dialog.addEventListener('close', () => dialog.remove());
   dialog.addEventListener('click', (e) => {
     if (e.target === dialog || (e.target as HTMLElement).closest('.close')) dialog.close();

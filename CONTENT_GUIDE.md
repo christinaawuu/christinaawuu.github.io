@@ -5,6 +5,7 @@ Everything you see on the site comes from plain text files in the `content/` fol
 | File | What it controls |
 |---|---|
 | `content/projects/<name>.md` | One project, job, or hobby spot. Each file becomes a building on the map and a card on the career page. |
+| `content/neighborhoods/<category>.md` | The sign at each neighborhood's entrance: an explanation of the neighborhood, plus your own recommendations. |
 | `content/about.md` | The "About me" panel (the 🏠 pin in Brooklyn). |
 | `content/site.json` | Your name, headline, intro, photo, stats, skills, links, and resume links on the career page. |
 | `public/images/` | Photos and screenshots. |
@@ -62,6 +63,31 @@ links:
 - Put image files in `public/images/` and refer to them as `images/file.png` (no `public/`, no leading slash).
 - Video: `type: video` with an mp4 in `public/clips/` (`src: clips/session.mp4`), or `type: youtube` with the YouTube video ID. Keep clips short, since big files slow the site.
 - Playtest clips: use `showIn: [career]` so they only appear on the career page. See `content/_playtest-template.md`.
+
+### Brooklyn (hobby spots) extras
+
+Entries with `category: spots` appear in the Brooklyn neighborhood. They can also have:
+
+```yaml
+building: gym        # which building to draw: gym, pizza, arcade, lab, bank, gallery, warehouse, office, flatiron, hall, bodega
+prop: bike-rack      # or draw a standalone prop instead of a building: bike-rack, picnic, bridge
+park: true           # green park-style lot instead of pavement
+action: bike         # a little interaction on the F key: bike, reps, photo, or snack:🍕 (any emoji)
+```
+
+## Neighborhood signs and your recommendations
+
+Each neighborhood has a sign near the subway entrance. Edit its file in `content/neighborhoods/` (for example `games.md`). The text under the `---` lines is the explanation. To add recommendations, replace `picks: []` with:
+
+```yaml
+picks:
+  - name: Joe's Pizza
+    note: Best classic slice near Times Square
+  - name: Bryant Park
+    note: Great spot to read in the afternoon
+```
+
+They show up on the sign under "My picks".
 
 ## 2. Edit an existing project
 

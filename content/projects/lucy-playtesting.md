@@ -1,6 +1,7 @@
 ---
 title: Lucy Playtesting Program
 category: playtesting
+alsoIn: [games]
 date: "2025"
 summary: Directed 50+ playtesting sessions and turned player feedback into iterations that lifted satisfaction by 60%.
 tags: [Playtesting, UX, Player Feedback]

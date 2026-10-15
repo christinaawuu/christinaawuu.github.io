@@ -87,3 +87,8 @@ body:not(.mode-world) { overflow-x: clip; }
   .reveal { opacity: 1; transform: none; transition: none; }
   .art-item .float, .ring, .chip-float, .boat, .beacon .beam, .pulse { animation: none !important; }
 }
+
+.edu { background: #fff; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; border-left: 6px solid #9a6fd1; }
+.edu h3 { margin: 0 0 4px; } .edu p { margin: 0; color: var(--muted); }
+.awards { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+.awards li { background: #fdf6ec; border-radius: 999px; padding: 5px 12px; font-weight: 700; font-size: .85rem; }

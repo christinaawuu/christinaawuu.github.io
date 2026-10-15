@@ -1,6 +1,7 @@
 ---
 title: Web Developer Intern, Cultured Kids Cuisine
 category: apps
+alsoIn: [design]
 date: "2022-07"
 dateLabel: "Jul - Aug 2022"
 summary: Rebuilt the events page and shipped an interactive gallery for 15+ educational workshops.

@@ -1,6 +1,7 @@
 ---
 title: Software Engineer, Cathartic Health
 category: experience
+alsoIn: [engineering, apps]
 date: "2023-03"
 dateLabel: "Mar 2023 - May 2025"
 summary: Built the donation matchmaking platform behind $300K+ in health and hygiene product donations.

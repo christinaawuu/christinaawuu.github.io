@@ -1,11 +1,13 @@
 ---
-title: My Favorite NYC Food Spots
+title: My NYC Food Spots
 category: spots
 date: "2026-01"
-summary: TODO one line about being a foodie.
+summary: I'm a foodie, and New York is the best city to be one in.
 tags: [Food, Hobby]
-draft: true   # TODO: set to false once you add your list
+building: pizza
+action: snack:🍕
 ---
 
-TODO: your top spots, ranked, with a line about each. Paste them here or send a screenshot of your Beli list.
-Each iconic spot can also get its own landmark on the map later, such as a pizza shop or a bagel place.
+I'm a total foodie and I rank everywhere I eat on Beli. My favorite spots will land here, so check back soon.
+
+In the map, press **F** (or tap the 🍕 button) at the pizza shop to grab a slice.

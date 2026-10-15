@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 150" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>.glow{animation:gl 2.2s ease-in-out infinite}@keyframes gl{0%,100%{opacity:.25}50%{opacity:.7}}</style>
+<ellipse cx="55" cy="140" rx="34" ry="7" fill="#3b2f3a" opacity=".2" stroke="none"/>
+<circle class="glow" cx="55" cy="58" r="52" fill="#ffe9a8" stroke="none"/>
+<rect x="49" y="38" width="12" height="100" rx="3" fill="#8a5a44"/>
+<rect x="10" y="18" width="90" height="52" rx="8" fill="#d9a066"/>
+<path d="M18 30h74M18 42h74M18 54h46" stroke="#a97a45" stroke-width="2.5"/>
+<circle cx="84" cy="52" r="10" fill="#fdf6ec"/><path d="M84 47v1M84 51v7" stroke-width="3"/>
+<path d="M14 82h56l12 11-12 11H14z" fill="#e8505b"/><path d="M26 93h40" stroke="#fdf6ec" stroke-width="3"/>
+</svg>

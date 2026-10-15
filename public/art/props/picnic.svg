@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<style>.bob{animation:b 3s ease-in-out infinite;transform-box:fill-box;transform-origin:center bottom}@keyframes b{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}</style>
+<defs><pattern id="chk" width="28" height="28" patternUnits="userSpaceOnUse"><rect width="28" height="28" fill="#fdf6ec"/><rect width="14" height="14" fill="#e8505b"/><rect x="14" y="14" width="14" height="14" fill="#e8505b"/></pattern></defs>
+<ellipse cx="120" cy="124" rx="108" ry="10" fill="#3b2f3a" opacity=".16" stroke="none"/>
+<path d="M30 112L52 50h136l22 62z" fill="url(#chk)"/>
+<path d="M30 112L52 50h136l22 62z"/>
+<!-- basket -->
+<g class="bob"><path d="M76 84h50l-6 22H82z" fill="#d9a066"/><path d="M84 84c0-16 34-16 34 0" /><path d="M82 94h38M84 100h34" stroke-width="2"/></g>
+<!-- snacks -->
+<circle cx="150" cy="86" r="9" fill="#e8505b" stroke-width="2.5"/><circle cx="168" cy="92" r="8" fill="#f6c453" stroke-width="2.5"/><circle cx="148" cy="100" r="7" fill="#a5cf9a" stroke-width="2.5"/>
+<rect x="130" y="70" width="10" height="26" rx="4" fill="#4c7bd9" stroke-width="2.5"/>
+</svg>

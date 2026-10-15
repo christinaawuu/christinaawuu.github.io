@@ -1,6 +1,7 @@
 ---
 title: Website Design, MoCADA
 category: apps
+alsoIn: [design]
 date: "2021-07"
 dateLabel: "Jul - Aug 2021"
 summary: Designed and built new pages for a museum of contemporary African Diasporan art, lifting page views by 25%.

@@ -1,6 +1,7 @@
 ---
 title: Creative Director, USC Own It
 category: design
+alsoIn: [involvement]
 date: "2023-03"
 dateLabel: "Mar 2023 - May 2025"
 summary: Social media and brand work for a nonprofit that connects women and non-binary professionals with students.

@@ -8,7 +8,7 @@ let filter: Category | 'all' = 'all';
 const STROKE = 'fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
 // Floating decorations: [svg, left %, top %, size px, parallax speed, rotation deg]
 const ART: [string, number, number, number, number, number][] = [
-  [`<svg viewBox="0 0 80 50" ${STROKE}><rect x="4" y="6" width="72" height="38" rx="19" fill="#3d4a7a"/><path d="M24 17v16M16 25h16" stroke="#fdf6ec" stroke-width="5"/><circle cx="56" cy="20" r="4.5" fill="#f6c453"/><circle cx="64" cy="29" r="4.5" fill="#4f9d8f"/></svg>`, 6, 5, 110, 0.18, -12],
+  [`<svg viewBox="0 0 80 50" ${STROKE}><rect x="4" y="6" width="72" height="38" rx="19" fill="#3d4a7a"/><path d="M24 17v16M16 25h16" stroke="#fdf6ec" stroke-width="5"/><circle cx="56" cy="20" r="4.5" fill="#f6c453"/><circle cx="64" cy="29" r="4.5" fill="#4f9d8f"/></svg>`, 64, 1.5, 110, 0.18, -12],
   [`<svg viewBox="0 0 60 60" ${STROKE}><path d="M30 5l7 17 18 2-14 12 5 18-16-10-16 10 5-18L5 24l18-2z" fill="#f6c453"/></svg>`, 88, 9, 64, 0.32, 14],
   [`<svg viewBox="0 0 70 70" ${STROKE}><path d="M35 6l24 12v26L35 56 11 44V18z" fill="#9a6fd1"/><path d="M11 18l24 12 24-12M35 30v26" /></svg>`, 82, 24, 84, 0.22, 8],
   [`<svg viewBox="0 0 90 50" ${STROKE}><path d="M26 8L6 25l20 17M64 8l20 17-20 17M52 4L38 46" stroke="#4c7bd9" stroke-width="5"/></svg>`, 4, 30, 100, 0.28, 6],
@@ -110,6 +110,12 @@ function page(): string {
       <h2 class="reveal">Experience</h2>
       <ol class="timeline">${jobs.map(timelineItem).join('')}</ol>
     </section>
+
+    ${siteInfo.education ? `<section class="block" id="career-education">
+      <h2 class="reveal">Education</h2>
+      <div class="edu reveal"><div><h3>${esc(siteInfo.education.school)}</h3><p>${esc(siteInfo.education.degree)} · ${esc(siteInfo.education.years)}</p></div>
+        <ul class="awards">${siteInfo.education.awards.map((a) => `<li>🏅 ${esc(a)}</li>`).join('')}</ul></div>
+    </section>` : ''}
 
     <section class="block" id="career-skills">
       <h2 class="reveal">Skills</h2>

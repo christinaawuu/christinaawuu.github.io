@@ -1,10 +1,14 @@
 ---
-title: Picnics in Central and Prospect Park
+title: Picnics in Prospect and Central Park
 category: spots
 date: "2026-01"
-summary: TODO one line about your picnics.
+summary: A blanket, good snacks, and a sunny lawn in Prospect Park or Central Park.
 tags: [Picnics, Parks, Hobby]
-draft: true   # TODO: set to false once you add details and a photo
+prop: picnic
+park: true
+action: snack:🍓
 ---
 
-TODO: your picnic setup, favorite spot in each park, and a photo.
+Give me a blanket, some snacks, and a sunny lawn in Prospect Park or Central Park and I'm happy.
+
+In the map, press **F** (or tap the 🍓 button) at the blanket to dig into the snacks.

@@ -2,9 +2,12 @@
 title: The Gym
 category: spots
 date: "2026-01"
-summary: TODO one line about working out.
+summary: I like working out.
 tags: [Fitness, Hobby]
-draft: true   # TODO: set to false once you add details
+building: gym
+action: reps
 ---
 
-TODO: what your routine looks like and what you enjoy about it.
+I like working out, and it's a big part of how I spend my free time.
+
+In the map, press **F** (or tap the 💪 button) at the gym to do some reps.
