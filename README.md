@@ -38,3 +38,12 @@ npm run dev
 3. In the repo, go to Settings, then Pages, and set Source to **GitHub Actions**.
 
 See `PLAN.md` for the roadmap.
+
+## How the site is organized
+
+- `#/explore`: the NYC map. Tap or zoom into a glowing neighborhood to walk around it.
+- `#/career`: the professional page, grouped by category (the neighborhood shows as a tag).
+- `content/projects/*.md`: every entry. `showIn: [career]` keeps an entry off the map; hobby spots default to the map only.
+- `content/about.md`: the "About me" pin in Brooklyn.
+- Hobby spots get a pin on the map once their entry is live. Their positions are in `SPOT_POS` in `src/neighborhoods.ts`.
+- Preview drafts while developing by adding `?drafts` to the local URL.

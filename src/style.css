@@ -13,11 +13,13 @@
 * { box-sizing: border-box; }
 body { margin: 0; }
 #app { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
+body.mode-world { overflow: hidden; background: #8fc9e0; }
+body.mode-world #app { max-width: none; margin: 0; padding: 0; }
 
 h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.4rem); }
 .tagline { margin: 4px 0 0; color: var(--muted); }
 
-.top { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.hud-career { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .modes { display: flex; gap: 8px; flex-wrap: wrap; }
 .tab { padding: 10px 16px; border-radius: 999px; background: #fff; color: var(--ink); text-decoration: none; font-weight: 700; box-shadow: var(--shadow); }
 .tab.active { background: var(--ink); color: #fff; }
@@ -61,3 +63,58 @@ h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.4rem); }
   #app { padding: 16px 14px 40px; }
   .panel { padding: 20px; }
 }
+
+.tags li.place { background: color-mix(in srgb, var(--accent) 22%, white); font-weight: 700; }
+.hud-career h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+
+/* ---------- world: shared HUD ---------- */
+#world-root { position: fixed; inset: 0; overflow: hidden; }
+.hud-world { position: fixed; left: 12px; top: 12px; z-index: 10000; background: rgba(253,246,236,.95); border-radius: 16px; padding: 12px 14px; box-shadow: 0 4px 16px rgba(0,0,0,.25); max-width: min(300px, calc(100vw - 24px)); }
+.hud-world h1 { font-size: 1.05rem; margin: 0 0 2px; }
+.hud-world p { margin: 0 0 8px; font-size: .8rem; color: var(--muted); }
+.hud-world .modes { gap: 6px; }
+.hud-world .tab { padding: 6px 12px; font-size: .8rem; box-shadow: none; border: 2px solid #e6dcc8; }
+.hud-world .tab.active { border-color: var(--ink); }
+.hud-btn { display: inline-block; margin: 0 6px 8px 0; padding: 6px 12px; border-radius: 999px; background: #2f7d5b; color: #fff; font-weight: 800; font-size: .8rem; text-decoration: none; }
+#toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: #2b2433; color: #fff; padding: 10px 18px; border-radius: 12px; font-weight: 700; display: none; z-index: 10001; max-width: 90vw; text-align: center; }
+
+/* ---------- world: city map ---------- */
+.city { position: absolute; inset: 0; background: #8fc9e0; overflow: hidden; cursor: grab; touch-action: none; }
+.city.dragging { cursor: grabbing; }
+.city-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-select: none; }
+.city-hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); background: rgba(255,255,255,.92); padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: .85rem; box-shadow: 0 4px 12px rgba(0,0,0,.2); pointer-events: none; white-space: nowrap; }
+.city-zoom { position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 8px; }
+.city-zoom button { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #3b2f3a; background: #fff; font-size: 1.4rem; font-weight: 800; cursor: pointer; color: #3b2f3a; }
+.city-label-text { font: 800 14px 'Nunito','Segoe UI',system-ui,sans-serif; fill: #2b2433; }
+.city-label-text.small { font-size: 12px; }
+.city-water-label { font: 800 22px 'Nunito','Segoe UI',system-ui,sans-serif; letter-spacing: 8px; fill: #fff; opacity: .7; }
+.city-park-label { font: 800 18px 'Nunito','Segoe UI',system-ui,sans-serif; letter-spacing: 5px; fill: #3b6b45; opacity: .7; }
+.beacon, .pin { cursor: pointer; }
+.city:not(.zoomed) .pin:not(.home) .lbl { display: none; }
+.beacon .beam { animation: beam 2.6s ease-in-out infinite; }
+.beacon .pulse, .pin .pulse { transform-box: fill-box; transform-origin: center; animation: ring 2.2s ease-out infinite; }
+.beacon.dim { cursor: default; opacity: .8; }
+@keyframes beam { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes ring { 0% { transform: scale(.7); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+.boat { animation: sail 22s ease-in-out infinite alternate; }
+.boat.b2 { animation-duration: 28s; animation-delay: -8s; }
+.boat.b3 { animation-duration: 18s; animation-delay: -4s; }
+@keyframes sail { from { transform: translate(-90px, 70px); } to { transform: translate(110px, -85px); } }
+
+/* ---------- world: neighborhood scene ---------- */
+.scene { position: absolute; inset: 0; overflow: hidden; background: #3b3547; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; animation: sceneIn .45s ease-out; }
+@keyframes sceneIn { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+.scene-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.scene .abs { position: absolute; }
+.scene .ent { position: absolute; pointer-events: none; }
+.scene .ent img, .scene .ent svg { width: 100%; height: 100%; display: block; }
+.scene .near img { filter: drop-shadow(0 0 10px #ffe9a8) drop-shadow(0 0 22px #ffd36e); }
+.scene .tag { position: absolute; z-index: 5000; transform: translate(-50%, -100%); padding: 4px 12px; border-radius: 14px; background: #fff; color: #2b2433; font-weight: 800; font-size: 13px; box-shadow: 0 3px 10px rgba(0,0,0,.25); max-width: 210px; text-align: center; line-height: 1.2; pointer-events: none; border: 2px solid var(--c); }
+.scene .road-label { position: absolute; color: #fdf6ec; opacity: .5; font-weight: 800; letter-spacing: 6px; font-size: 15px; white-space: nowrap; pointer-events: none; }
+.scene .road-label.v { writing-mode: vertical-rl; }
+.scene .ripple { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; border: 3px solid #ffe9a8; animation: rp .6s ease-out forwards; pointer-events: none; z-index: 1; }
+@keyframes rp { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
+.scene-prompt { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); background: #fff; border-radius: 999px; padding: 12px 22px; font-weight: 700; box-shadow: 0 6px 20px rgba(0,0,0,.3); z-index: 10000; cursor: pointer; border: 3px solid var(--c, #e8505b); text-align: center; max-width: calc(100vw - 24px); }
+.scene-prompt span { color: var(--muted); font-weight: 600; font-size: .85em; }
+.scene-toast { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); background: #2b2433; color: #fff; padding: 10px 18px; border-radius: 12px; font-weight: 700; display: none; z-index: 10001; max-width: 90vw; text-align: center; }
+@media (max-width: 520px) { .hud-world p { display: none; } }

@@ -50,12 +50,12 @@ Participant video needs consent from the players before publishing.
 
 ## Phases
 
-1. [x] Foundation: Vite, content schema, deploy workflow, Browse page
-2. [x] Art direction: first-style buildings with depth, new character, walkable prototype (`/world.html`)
-3. [ ] Content rework: new categories and neighborhoods, structured playtest and spot types
-4. [ ] City overview map and the zoom transition
-5. [ ] Neighborhood scenes with spacing, landmarks, panels connected to content
-6. [ ] Career page
-7. [ ] Hobby spots and personality layer
-8. [ ] Polish: performance pass, audio (muted by default), share previews, accessibility
-9. [ ] Real content: Maya renders, playtest recordings, board games, Lucy details
+1. [x] Foundation: Vite, content schema, deploy workflow
+2. [x] Art direction: first-style buildings with depth, new character
+3. [x] Content rework: nine neighborhoods, involvement and hobby entries, media and showIn fields
+4. [x] City overview map with beacons, pan, pinch and wheel zoom, and the zoom-in transition
+5. [x] Neighborhood scenes: spaced-out walkable streets generated from each neighborhood's entries
+6. [x] Career page: grouped by category, neighborhood shown as a tag
+7. [ ] Hobby spots with real photos and stories (pins already appear on the map once an entry is live)
+8. [ ] Polish: performance pass, audio (muted by default), share previews, accessibility, see-through outline behind buildings
+9. [ ] Real content: Maya renders, playtest clips, board games, Lucy details, food spots

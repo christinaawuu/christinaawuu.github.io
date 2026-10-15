@@ -45,7 +45,10 @@ const files = import.meta.glob('/content/projects/*.md', {
   eager: true,
 }) as Record<string, string>;
 
-const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
+// While developing, add ?drafts to the URL to preview entries marked draft: true.
+const SHOW_DRAFTS = import.meta.env.DEV && new URLSearchParams(location.search).has('drafts');
+
+const FRONTMATTER =/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
 const CATEGORIES = new Set<string>(NEIGHBORHOODS.map((n) => n.category));
 
 function toProject(path: string, raw: string): Project | null {
@@ -58,7 +61,7 @@ function toProject(path: string, raw: string): Project | null {
     return null;
   }
   const data = (parse(match[1]) ?? {}) as Record<string, unknown>;
-  if (data.draft === true) return null;
+  if (data.draft === true && !SHOW_DRAFTS) return null;
 
   if (typeof data.title !== 'string' || !data.title) {
     console.warn(`[content] ${slug}: "title" is required, skipped`);
@@ -92,7 +95,8 @@ function toProject(path: string, raw: string): Project | null {
     featured: data.featured === true,
     links,
     media,
-    showIn: showIn.length ? showIn : ['world', 'career'],
+    // hobby spots live in the world only unless the entry says otherwise
+    showIn: showIn.length ? showIn : data.category === 'spots' ? ['world'] : ['world', 'career'],
     body: match[2].trim(),
   };
 }
@@ -101,3 +105,20 @@ export const projects: Project[] = Object.entries(files)
   .map(([path, raw]) => toProject(path, raw))
   .filter((p): p is Project => p !== null)
   .sort((a, b) => Number(b.featured) - Number(a.featured) || b.date.localeCompare(a.date));
+
+// content/about.md is the "About me" panel (the home pin on the city map).
+const aboutFiles = import.meta.glob('/content/about.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+export const about: Project | null =
+  Object.entries(aboutFiles).map(([path, raw]) => toProject(path, raw))[0] ?? null;
+
+/** Everything that can be opened from the world, by file name. */
+export const bySlug = (slug: string): Project | undefined =>
+  projects.find((p) => p.slug === slug) ?? (about?.slug === slug ? about : undefined);
+
+/** Entries shown in a neighborhood scene. */
+export const worldEntries = (category: Category): Project[] =>
+  projects.filter((p) => p.category === category && p.showIn.includes('world'));
