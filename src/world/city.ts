@@ -156,16 +156,20 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
       }
     }
   }
-  // Downtown Brooklyn: a cluster of high-rises
+  // Downtown Brooklyn: a dense cluster of high-rises, tallest in the middle and thinning out toward the edges
   {
     const dtb = xy([40.6925, -73.989]);
-    for (let dx = -120; dx <= 120; dx += 22) {
-      for (let dy = -100; dy <= 100; dy += 20) {
+    for (let dx = -190; dx <= 190; dx += 15) {
+      for (let dy = -170; dy <= 170; dy += 14) {
         const d = Math.hypot(dx, dy);
-        if (d > 125) continue;
-        const x = dtb.x + dx + (dr() - 0.5) * 8, y = dtb.y + dy + (dr() - 0.5) * 8;
-        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 50)) continue;
-        const h = 38 + dr() * 30 - d * 0.12;
+        if (d > 185) continue;
+        const k = (Math.sin((dx + 400) * 12.9898 + (dy + 400) * 78.233) * 43758.5453) % 1; // steady pseudo-random value per spot
+        const kk = Math.abs(k);
+        const keep = d < 105 ? 0.97 : Math.max(0.2, 0.97 - (d - 105) * 0.0095); // nearly every spot in the core, then tapering
+        if (kk > keep) continue;
+        const x = dtb.x + dx + (dr() - 0.5) * 6, y = dtb.y + dy + (dr() - 0.5) * 6;
+        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 40)) continue;
+        const h = (34 + 38 * Math.exp(-(d * d) / (2 * 80 * 80))) * (0.75 + 0.5 * dr()); // taller toward the center
         bldgs.push({ x, y, w: h * 0.62, h, c: pick() });
       }
     }
