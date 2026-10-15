@@ -3,7 +3,7 @@ import './career.css';
 import { renderCareer } from './career';
 import { siteInfo, worldEntries } from './content';
 import { NEIGHBORHOODS, neighborhoodFor, type Category } from './neighborhoods';
-import { openProject, openSign } from './panel';
+import { openContact, openProject, openResume, openSign } from './panel';
 import { asset, esc } from './util';
 import { createCity, type CityHandle } from './world/city';
 import { createScene, type SceneHandle } from './world/scene';
@@ -51,8 +51,8 @@ function renderHud(mode: 'city' | 'scene' | 'career', category?: Category): void
   hud.className = 'hud-world';
   const resume = siteInfo.resumes?.[0];
   const tools = `<div class="hud-tools">
-    ${resume ? `<a href="${esc(asset(resume.url))}" target="_blank" rel="noopener">📄 Resume</a>` : ''}
-    ${siteInfo.email ? `<a href="mailto:${esc(siteInfo.email)}">✉️ Contact</a>` : ''}
+    ${resume ? `<a href="${esc(asset(resume.url))}" target="_blank" rel="noopener" data-resume data-label="${esc(resume.label)}">📄 Resume</a>` : ''}
+    ${siteInfo.email ? `<a href="mailto:${esc(siteInfo.email)}" data-contact>✉️ Contact</a>` : ''}
     <button class="night-toggle" aria-label="Switch between day and night">${document.body.classList.contains('night') ? '☀️ Day' : '🌙 Night'}</button>
   </div>`;
   if (mode === 'scene' && category) {
@@ -132,6 +132,14 @@ hud.addEventListener('click', (e) => {
   setNight(on);
   localStorage.setItem('theme', on ? 'night' : 'day');
   (e.target as HTMLElement).closest('.night-toggle')!.textContent = on ? '☀️ Day' : '🌙 Night';
+});
+
+// resume viewer and contact form, from anywhere on the site
+document.addEventListener('click', (e) => {
+  const t = e.target as HTMLElement;
+  const r = t.closest<HTMLElement>('[data-resume]');
+  if (r) { e.preventDefault(); openResume(r.dataset.label ?? 'Resume', r.getAttribute('href')!); return; }
+  if (t.closest('[data-contact]') && siteInfo.email) { e.preventDefault(); openContact(siteInfo.email, siteInfo.contactEndpoint || undefined); }
 });
 
 window.addEventListener('hashchange', route);

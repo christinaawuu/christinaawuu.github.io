@@ -233,10 +233,78 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
     .map(([name, d]) => `<path d="${d}" fill="${landFill(name)}" stroke="#3b2f3a" stroke-width="${name === 'Manhattan' ? 6 : 5}" stroke-linejoin="round"/>`)
     .join('');
 
+
+  /* ---------- polish: the C train, more parks, landmarks, clouds ---------- */
+  const PINKLINE = '#f48fb1';
+  const C_LINE: [number, number][] = [
+    [40.8407, -73.94], [40.8277, -73.9442], [40.8, -73.9582], [40.7916, -73.9645], [40.7814, -73.9722], [40.7683, -73.9819], [40.7573, -73.9898],
+    [40.7523, -73.9933], [40.7457, -73.9987], [40.741, -74.0013], [40.7326, -74.0003], [40.7227, -74.0049], [40.7131, -74.0093], [40.7102, -74.0075],
+    [40.6993, -73.9905], [40.6924, -73.9873], [40.6884, -73.9851], [40.6866, -73.9738], [40.6832, -73.9658], [40.6811, -73.9564], [40.6797, -73.9411], [40.679, -73.93],
+  ];
+  const C_STATIONS: { ll: [number, number]; name: string; bullet?: boolean }[] = [
+    { ll: [40.7683, -73.9819], name: 'Columbus Circle', bullet: true },
+    { ll: [40.7573, -73.9898], name: 'Port Authority' },
+    { ll: [40.7523, -73.9933], name: '34 St-Penn Station', bullet: true },
+    { ll: [40.741, -74.0013], name: '14 St' },
+    { ll: [40.7326, -74.0003], name: 'W 4 St' },
+    { ll: [40.7131, -74.0093], name: 'Chambers St' },
+    { ll: [40.7102, -74.0075], name: 'Fulton St', bullet: true },
+    { ll: [40.6993, -73.9905], name: 'High St' },
+    { ll: [40.6884, -73.9851], name: 'Hoyt-Schermerhorn' },
+    { ll: [40.6832, -73.9658], name: 'Clinton-Washington' },
+  ];
+  const cPts = C_LINE.map(xy);
+  const cPath = 'M' + cPts.map((q) => `${q.x.toFixed(0)} ${q.y.toFixed(0)}`).join('L');
+  const bullet = (r: number) => `<circle r="${r}" fill="${PINKLINE}" stroke="#3b2f3a" stroke-width="3"/><path d="M${(r * 0.45).toFixed(1)} ${(-r * 0.5).toFixed(1)}A${(r * 0.58).toFixed(1)} ${(r * 0.58).toFixed(1)} 0 1 0 ${(r * 0.45).toFixed(1)} ${(r * 0.5).toFixed(1)}" fill="none" stroke="#fdf6ec" stroke-width="${(r * 0.3).toFixed(1)}" stroke-linecap="round"/>`;
+  const cLineSvg = `
+    <path d="${cPath}" fill="none" stroke="#3b2f3a" stroke-width="11" stroke-linejoin="round" stroke-linecap="round" opacity=".85"/>
+    <path d="${cPath}" fill="none" stroke="${PINKLINE}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${cPath}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 14" stroke-linecap="round" class="c-flow"/>
+    ${C_STATIONS.map((st) => {
+      const q = xy(st.ll);
+      return `<g transform="translate(${q.x.toFixed(0)} ${q.y.toFixed(0)})"><circle r="8" fill="#fdf6ec" stroke="#3b2f3a" stroke-width="3"/>${st.bullet ? `<g transform="translate(0 -24)">${bullet(13)}</g>` : ''}
+        <g class="lbl zoomed-only" data-off="${st.bullet ? 44 : 20}"><rect x="-70" y="-11" width="140" height="22" rx="11" fill="#fff" stroke="${PINKLINE}" stroke-width="2.5"/><text y="4.5" text-anchor="middle" class="city-label-text small">${esc(st.name)}</text></g></g>`;
+    }).join('')}`;
+
+  const blob = (ll: [number, number], rx: number, ry: number, rot = ANGLE) => {
+    const q = xy(ll);
+    return `<ellipse cx="${q.x.toFixed(0)}" cy="${q.y.toFixed(0)}" rx="${rx}" ry="${ry}" fill="#a5cf9a" stroke="#3b2f3a" stroke-width="3" transform="rotate(${rot} ${q.x.toFixed(0)} ${q.y.toFixed(0)})"/>`;
+  };
+  const extraParks = [
+    blob([40.7308, -73.9973], 15, 15), blob([40.7359, -73.9903], 14, 9), blob([40.7421, -73.9879], 12, 8), blob([40.7536, -73.9832], 22, 9),
+    blob([40.7033, -74.017], 26, 20), blob([40.7015, -73.9965], 36, 10, -35), blob([40.7169, -73.9777], 18, 12),
+  ].join('');
+
+  const icon = (ll: [number, number], name: string, art: string) => {
+    const q = xy(ll);
+    return `<g transform="translate(${q.x.toFixed(0)} ${q.y.toFixed(0)})" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round">${art}
+      <g class="lbl zoomed-only" data-off="14"><rect x="-80" y="-11" width="160" height="22" rx="11" fill="#fff" stroke="#3b2f3a" stroke-width="2"/><text y="4.5" text-anchor="middle" class="city-label-text small">${esc(name)}</text></g></g>`;
+  };
+  const landmarkIcons = [
+    icon([40.7484, -73.9857], 'Empire State Building', '<ellipse cy="2" rx="18" ry="6" fill="#3b2f3a" opacity=".2" stroke="none"/><rect x="-14" y="-40" width="28" height="40" fill="#cfc8d6"/><rect x="-10" y="-62" width="20" height="22" fill="#bfb8c9"/><rect x="-6" y="-78" width="12" height="16" fill="#cfc8d6"/><path d="M0 -78V-102" stroke-width="3"/>'),
+    icon([40.7516, -73.9755], 'Chrysler Building', '<ellipse cy="2" rx="16" ry="5" fill="#3b2f3a" opacity=".2" stroke="none"/><rect x="-11" y="-46" width="22" height="46" fill="#d9d3c4"/><path d="M-11 -46Q0 -84 11 -46z" fill="#e6e1d6"/><path d="M-7 -52Q0 -70 7 -52M-4 -62Q0 -74 4 -62" fill="none" stroke-width="2"/><path d="M0 -78V-94" stroke-width="3"/>'),
+    icon([40.7127, -74.0134], 'One World Trade Center', '<ellipse cy="2" rx="16" ry="5" fill="#3b2f3a" opacity=".2" stroke="none"/><path d="M-12 0L-8 -66L0 -74L8 -66L12 0z" fill="#cfe0ee"/><path d="M0 -74V-112" stroke-width="3"/>'),
+  ].join('');
+
+  const cloud = (x: number, y: number, k: number, dur: number, delay: number) => `
+    <g class="cloud" style="animation-duration:${dur}s;animation-delay:${delay}s"><g transform="translate(${x} ${y}) scale(${k})">
+      <g transform="translate(60 120)" opacity=".13" fill="#3b2f3a"><ellipse rx="70" ry="22"/><ellipse cx="50" cy="-8" rx="46" ry="16"/></g>
+      <g fill="#fff" opacity=".82"><ellipse rx="64" ry="20"/><ellipse cx="-34" cy="6" rx="38" ry="16"/><ellipse cx="38" cy="4" rx="46" ry="18"/><ellipse cx="6" cy="-14" rx="34" ry="18"/></g></g></g>`;
+  const clouds = [cloud(-300, 700, 1.4, 150, 0), cloud(-300, 1500, 1.1, 190, -70), cloud(-300, 2300, 1.6, 170, -120), cloud(-300, 3000, 1.2, 210, -40)].join('');
+
+  const streetLabel = (ll: [number, number], text: string, rot: number) => {
+    const q = xy(ll);
+    return `<text x="${q.x.toFixed(0)}" y="${q.y.toFixed(0)}" transform="rotate(${rot} ${q.x.toFixed(0)} ${q.y.toFixed(0)})" class="city-street-label zoomed-only" text-anchor="middle">${text}</text>`;
+  };
+  const streetLabels = [
+    streetLabel([40.736, -74.0125], 'WEST SIDE HIGHWAY', -61), streetLabel([40.736, -73.9722], 'FDR DRIVE', -61), streetLabel([40.7565, -74.0095], 'HUDSON YARDS', -61),
+    streetLabel([40.7088, -73.9976], 'BROOKLYN BRIDGE', 38), streetLabel([40.7138, -73.9885], 'MANHATTAN BRIDGE', 82), streetLabel([40.7125, -73.9695], 'WILLIAMSBURG BRIDGE', 14), streetLabel([40.7545, -73.95], 'QUEENSBORO BRIDGE', 20),
+  ].join('');
+
   wrap.innerHTML = `
     <svg class="city-svg" aria-label="Map of New York City with my neighborhoods" role="img">
       <defs>${gradDefs}${buildingSymbol}
-        <pattern id="waves" width="60" height="30" patternUnits="userSpaceOnUse"><path d="M0 15q15-12 30 0t30 0" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="2"/></pattern>
+        <pattern id="waves" width="60" height="30" patternUnits="userSpaceOnUse"><path d="M0 15q15-12 30 0t30 0" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="2"/><animateTransform attributeName="patternTransform" type="translate" from="0 0" to="60 0" dur="9s" repeatCount="indefinite"/></pattern>
         <clipPath id="manhattan-clip"><path d="${BOROUGH_PATHS.Manhattan}"/></clipPath>
       </defs>
       <rect class="city-water" x="-8000" y="-8000" width="20000" height="20000" fill="#8fc9e0"/>
@@ -248,20 +316,26 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
         <polygon points="${poly(parkPts(CENTRAL_PARK))}" fill="#a5cf9a" stroke="#3b2f3a" stroke-width="4" stroke-linejoin="round"/>
         <path d="${smooth(parkPts(PROSPECT_PARK))}" fill="#a5cf9a" stroke="#3b2f3a" stroke-width="4" stroke-linejoin="round"/>
         <ellipse cx="${pond.x.toFixed(0)}" cy="${pond.y.toFixed(0)}" rx="26" ry="14" fill="#7fc4e0" stroke="#3b2f3a" stroke-width="3" transform="rotate(${ANGLE} ${pond.x.toFixed(0)} ${pond.y.toFixed(0)})"/>
+        ${extraParks}
         ${bridgeSvg}
+        ${cLineSvg}
+        ${streetLabels}
         ${label([40.775, -74.03], 'HUDSON RIVER', -61)}${label([40.77, -73.935], 'EAST RIVER', -61)}${label([40.62, -74.03], 'UPPER BAY', 0)}
         ${label([40.67, -73.93], 'BROOKLYN', 0)}${label([40.755, -73.88], 'QUEENS', 0)}${label([40.83, -73.9], 'THE BRONX', 0)}${label([40.74, -74.065], 'NEW JERSEY', -61)}
         ${label([40.786, -73.966], 'CENTRAL PARK', -61, 'city-park-label')}${label([40.659, -73.969], 'PROSPECT PARK', -61, 'city-park-label')}
         <g transform="translate(${statue.x.toFixed(0)} ${statue.y.toFixed(0)})" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round">
           <ellipse cy="16" rx="22" ry="9" fill="#cdbf9f"/><rect x="-8" y="-4" width="16" height="20" fill="#b9c9bb"/><path d="M-12 -4l12-26 12 26z" fill="#8fc7ae"/><path d="M10 -22l8-14" stroke-width="4"/><circle cx="19" cy="-39" r="5" fill="#ffd36e"/></g>
+        ${landmarkIcons}
         ${boat([40.757, -74.0155], 'b1', '#e8505b')}${boat([40.727, -73.9715], 'b2', '#f6c453')}${boat([40.665, -74.035], 'b3', '#4f9d8f')}
         ${bldgSvg}
         <rect class="night-rect" x="-4000" y="-4000" width="12000" height="12000" fill="#3c4a8c" opacity="0" style="mix-blend-mode:multiply;pointer-events:none"/>
         ${pinSvg}
         ${beaconSvg}
+        <g class="clouds" style="pointer-events:none">${clouds}</g>
       </g>
     </svg>
     <div class="city-hint"></div>
+    <svg class="city-compass" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="#fff" stroke="#3b2f3a" stroke-width="3"/><path d="M32 8l8 24-8-5-8 5z" fill="#f48fb1" stroke="#3b2f3a" stroke-width="2.5" stroke-linejoin="round"/><path d="M32 56l-8-24 8 5 8-5z" fill="#cfc8d6" stroke="#3b2f3a" stroke-width="2.5" stroke-linejoin="round"/><text x="32" y="20" text-anchor="middle" font-size="11" font-weight="900" font-family="Arial, sans-serif" fill="#3b2f3a" stroke="#fff" stroke-width="3" paint-order="stroke">N</text></svg>
     <a class="city-skip" href="#/career">⏭ Skip to career page</a>
     <div class="city-zoom"><button data-zoom="in" aria-label="Zoom in">+</button><button data-zoom="out" aria-label="Zoom out">−</button><button data-zoom="fit" aria-label="Show the whole city" class="fit">⤢</button></div>`;
 

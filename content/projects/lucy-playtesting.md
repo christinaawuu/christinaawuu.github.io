@@ -6,9 +6,6 @@ date: "2022-08"
 dateLabel: "Aug - Dec 2022"
 summary: Directed 50+ playtesting sessions and turned player feedback into iterations that lifted satisfaction by 60%.
 tags: [Playtesting, UX, Player Feedback]
-links:
-  - label: The game
-    url: https://christinawu.itch.io/lucy
 ---
 
 - Directed 50+ playtesting sessions for Lucy.

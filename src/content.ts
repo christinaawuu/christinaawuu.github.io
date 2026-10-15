@@ -57,6 +57,8 @@ export interface SiteInfo {
   resumes?: ProjectLink[];
   /** public contact email shown in the Contact section */
   email?: string;
+  /** optional Formspree-style URL; when set, the contact form posts to it instead of opening the visitor's mail app */
+  contactEndpoint?: string;
   education?: { school: string; degree: string; years: string; awards: string[] };
 }
 export const siteInfo = site as SiteInfo;

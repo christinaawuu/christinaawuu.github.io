@@ -7,16 +7,12 @@
   "photo": "images/christina.jpg",
   "links": [
     {
-      "label": "GitHub",
-      "url": "https://github.com/christinaawuu"
-    },
-    {
       "label": "LinkedIn",
       "url": "https://linkedin.com/in/christina-wu1"
     },
     {
-      "label": "itch.io",
-      "url": "https://christinawu.itch.io"
+      "label": "GitHub",
+      "url": "https://github.com/christinaawuu"
     }
   ],
   "stats": [
@@ -50,7 +46,6 @@
         "Java",
         "JavaScript",
         "Swift",
-        "SQL",
         "HTML/CSS",
         "Unreal Blueprints"
       ]
@@ -98,5 +93,6 @@
       "Viterbi Fall Lead Scholarship"
     ]
   },
-  "email": "christina.wu.dev@gmail.com"
+  "email": "christina.wu.dev@gmail.com",
+  "contactEndpoint": ""
 }

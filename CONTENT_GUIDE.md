@@ -144,3 +144,7 @@ You need Node.js (version 20 or newer) installed to preview. You do not need it 
 - `draft: true` hides an entry.
 - Open the repo's **Actions** tab. A red X means the build failed, and its log says which file is wrong.
 - Locally, add `?drafts` to the preview URL to see draft entries.
+
+## Contact form
+
+By default the form opens the visitor's email app with the message filled in. To have messages arrive in your inbox without opening an email app, make a free form at formspree.io (or a similar service), then paste its URL into `"contactEndpoint"` in `content/site.json`. Leave it empty to keep the email-app behavior.

@@ -35,7 +35,7 @@ interface Landmark {
   /** clickable area in world coordinates [x0, y0, x1, y1] */
   rect: [number, number, number, number];
   node: HTMLElement;
-  entry?: Project; sign?: SignInfo; exit?: boolean; action?: string; say?: string;
+  entry?: Project; sign?: SignInfo; exit?: boolean; action?: string; say?: string; bubble?: HTMLElement;
 }
 
 let playerSvg: Promise<string> | null = null;
@@ -184,7 +184,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     tree(bx + 40 + (seed % 24), by + 230, 100);
     tree(bx + BW - 140 - (seed % 20), by + 245, 96);
     if (entry.park) { tree(bx + 120, by + 160, 90); tree(bx + BW - 200, by + 150, 90); }
-    else ent('art/props/bench.svg', 110, 70, bx + BW - 190, by + BH - 50, 82, [bx + BW - 186, by + BH - 70, bx + BW - 112, by + BH - 50]);
+    else if (idx !== (rows - 1) * cols) ent('art/props/bench.svg', 110, 70, bx + BW - 190, by + BH - 50, 82, [bx + BW - 186, by + BH - 70, bx + BW - 112, by + BH - 50]);
     ent('art/props/hydrant.svg', 50, 64, bx + BW - 70, by + BH - 4, 28, [bx + BW - 66, by + BH - 16, bx + BW - 46, by + BH - 4]);
   });
 
@@ -205,13 +205,13 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
 
   // the C train entrance (your way back to the NYC map) and the neighborhood sign, by the spawn point
   const sw = blockPos((rows - 1) * cols);
-  const subway = ent('art/props/subway-entrance.svg', 140, 150, sw.x + 60, sw.y + BH + 2, 112, [sw.x + 70, sw.y + BH - 24, sw.x + 162, sw.y + BH + 2]);
+  const subway = ent('art/props/subway-entrance.svg', 200, 230, sw.x + 30, sw.y + BH + 2, 150, [sw.x + 45, sw.y + BH - 26, sw.x + 165, sw.y + BH + 2]);
   landmarks.push({
-    title: 'C train', sub: 'Back to the NYC map', icon: '🚇', color: PINK, x: sw.x + 116, y: sw.y + BH + 18, r: 85,
-    rect: [sw.x + 60, subway.top, sw.x + 172, sw.y + BH + 2], node: subway.d, exit: true,
+    title: 'C train', sub: 'Back to the NYC map', icon: '🚇', color: PINK, x: sw.x + 105, y: sw.y + BH + 18, r: 85,
+    rect: [sw.x + 30, subway.top, sw.x + 180, sw.y + BH + 2], node: subway.d, exit: true,
   });
-  label(sw.x + 116, subway.top - 12, '🚇 C train', PINK);
-  glowAt(sw.x + 116, subway.top + 40, 120);
+  label(sw.x + 105, subway.top - 10, '🚇 C train station', PINK);
+  glowAt(sw.x + 105, subway.top + 60, 150);
 
   const signInfo = signFor(category);
   if (signInfo) {
@@ -224,13 +224,17 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     label(sx + 40, sign.top - 6, `ℹ️ ${nb.name} guide`, nb.color);
   }
 
-  // hot dog cart on the first block's north sidewalk
+  // hot dog cart and vendor on the spawn block's sidewalk, right by the C train and the sign
   {
-    const { x: bx, y: by } = blockPos(0);
-    const cart = ent('art/props/hotdog-cart.svg', 120, 110, bx + 50, by + 96, 92, [bx + 56, by + 78, bx + 136, by + 96]);
+    const cartLeft = sw.x + 310;
+    const cart = ent('art/props/hotdog-cart.svg', 120, 110, cartLeft, sw.y + BH + 2, 92, [cartLeft + 6, sw.y + BH - 18, cartLeft + 86, sw.y + BH + 2]);
+    const vend = ent('art/characters/vendor.svg', 64, 100, cartLeft + 100, sw.y + BH + 2, 54);
+    const bubble = el('bubble', { left: px(cartLeft + 127), top: px(vend.top - 8) }, lights);
+    bubble.textContent = 'Hot dog? 🌭';
+    glowAt(cartLeft + 70, sw.y + BH - 40, 110);
     landmarks.push({
-      title: 'Hot dog cart', sub: 'Street food', icon: '🌭', color: '#e8505b', x: bx + 96, y: by + 112, r: 110,
-      rect: [bx + 50, cart.top, bx + 142, by + 96], node: cart.d, action: 'snack:🌭', say: '🌭 One with everything, please!',
+      title: 'Hot dog vendor', sub: 'Street food', icon: '🌭', color: '#e8505b', x: cartLeft + 80, y: sw.y + BH + 18, r: 110,
+      rect: [cartLeft, cart.top, cartLeft + 156, sw.y + BH + 2], node: cart.d, bubble, action: 'snack:🌭', say: '🌭 One with everything, coming up!',
     });
   }
 
@@ -302,7 +306,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
   }
 
   /* ---------- player ---------- */
-  const player = { x: sw.x + 116, y: ST[rows] + SH / 2 + 10, speed: 230, dir: 'front', moving: false, target: null as { x: number; y: number } | null };
+  const player = { x: sw.x + 105, y: ST[rows] + SH / 2 + 10, speed: 230, dir: 'front', moving: false, target: null as { x: number; y: number } | null };
   const pEl = el('ent player', { width: '56px', height: '87px' });
   void loadPlayer().then((t) => { if (alive) pEl.innerHTML = t; });
 
@@ -329,12 +333,16 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
   };
 
   /* ---------- camera ---------- */
+  let userZoom = 1, baseScale = 1, cover = 0.3;
   let scale = 1, camX = 0, camY = 0;
+  const applyZoom = () => { scale = Math.max(cover, Math.min(2.4, baseScale * userZoom)); };
   const resize = () => {
     const base = Math.max(0.55, Math.min(1.15, innerWidth / 1100));
-    // zoom in just enough that the backdrop always fills the screen
-    scale = Math.max(base, Math.min(1.4, innerHeight / (H + 2 * M)), Math.min(1.4, innerWidth / (W + 2 * M)));
+    cover = Math.max(innerHeight / (H + 2 * M), innerWidth / (W + 2 * M)); // never zoom out past the backdrop
+    baseScale = Math.max(base, Math.min(1.4, cover));
+    applyZoom();
   };
+  const zoomBy = (f: number) => { scale = Math.max(cover, Math.min(2.4, scale * f)); userZoom = scale / baseScale; };
   window.addEventListener('resize', resize);
   resize();
   function camera() {
@@ -400,9 +408,37 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     }
   }
 
+  // zoom: mouse wheel, pinch, or the buttons
+  const zoomBox = document.createElement('div');
+  zoomBox.className = 'city-zoom scene-zoom';
+  zoomBox.innerHTML = '<button data-z="in" aria-label="Zoom in">+</button><button data-z="out" aria-label="Zoom out">−</button><button data-z="reset" class="fit" aria-label="Reset zoom">⤢</button>';
+  stage.appendChild(zoomBox);
+  zoomBox.addEventListener('click', (e) => {
+    const z = (e.target as HTMLElement).closest<HTMLElement>('[data-z]')?.dataset.z;
+    if (z === 'in') zoomBy(1.25); else if (z === 'out') zoomBy(0.8); else if (z === 'reset') { userZoom = 1; applyZoom(); }
+  });
+  stage.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(Math.exp(-e.deltaY * 0.0016)); }, { passive: false });
+  const touches = new Map<number, { x: number; y: number }>();
+  let pinchDist = 0;
+  stage.addEventListener('pointermove', (e) => {
+    if (!touches.has(e.pointerId)) return;
+    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (touches.size === 2) {
+      const [a, b] = [...touches.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (pinchDist) zoomBy(d / pinchDist);
+      pinchDist = d;
+    }
+  });
+  const endTouch = (e: PointerEvent) => { touches.delete(e.pointerId); if (touches.size < 2) pinchDist = 0; };
+  stage.addEventListener('pointerup', endTouch);
+  stage.addEventListener('pointercancel', endTouch);
+
   /** Tap a building to walk up to it and open it; tap anywhere else to walk there. */
   stage.addEventListener('pointerdown', (e) => {
-    if ((e.target as HTMLElement).closest('.scene-prompt')) return;
+    if ((e.target as HTMLElement).closest('.scene-prompt, .scene-zoom')) return;
+    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (touches.size > 1) { player.target = null; pending = null; return; } // a pinch, not a tap
     const wx = e.clientX / scale + camX, wy = e.clientY / scale + camY;
     const tapped = landmarks.find((l) => wx >= l.rect[0] && wx <= l.rect[2] && wy >= l.rect[1] && wy <= l.rect[3]);
     const rip = el('ripple', { left: px(wx), top: px(wy) });
@@ -489,6 +525,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
       if (d < l.r && d < best) { best = d; nearest = l; }
       l.node.classList.remove('near');
     });
+    landmarks.forEach((l) => l.bubble?.classList.toggle('show', l === nearest));
     const near = nearest as Landmark | null;
     if (near) {
       near.node.classList.add('near');

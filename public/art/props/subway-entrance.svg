@@ -1,15 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 150" fill="none" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-<style>.g{animation:gl 2s ease-in-out infinite}@keyframes gl{0%,100%{opacity:.45}50%{opacity:.9}}</style>
-<ellipse cx="70" cy="140" rx="60" ry="8" fill="#3b2f3a" opacity=".18" stroke="none"/>
-<rect x="18" y="80" width="104" height="56" rx="6" fill="#5b5566"/>
-<path d="M32 136V96h76v40z" fill="#2f2a38"/>
-<path d="M38 136V104M52 136V104M66 136V104M80 136V104M94 136V104" stroke="#5b5566" stroke-width="2.5"/>
-<path d="M18 80h104" stroke-width="3.5"/>
-<!-- railings and lamps -->
-<path d="M20 80V50M120 80V50" stroke="#f48fb1" stroke-width="5"/>
-<circle class="g" cx="20" cy="42" r="17" fill="#ffd1e0" stroke="none"/><circle class="g" cx="120" cy="42" r="17" fill="#ffd1e0" stroke="none"/>
-<circle cx="20" cy="42" r="9" fill="#fdf6ec"/><circle cx="120" cy="42" r="9" fill="#fdf6ec"/>
-<!-- sign -->
-<circle cx="70" cy="58" r="14" fill="#f48fb1"/><path d="M77 52.5A9 9 0 1 0 77 63.5" stroke="#fdf6ec" stroke-width="4.5"/>
-<path d="M20 50h100" stroke="#f48fb1" stroke-width="4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" fill="none" stroke="#3b2f3a" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<style>
+.g{animation:gl 2s ease-in-out infinite}@keyframes gl{0%,100%{opacity:.45}50%{opacity:1}}
+.bullet{animation:pu 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes pu{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.arrow{animation:ar 1.1s ease-in-out infinite}@keyframes ar{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+</style>
+<ellipse cx="100" cy="220" rx="88" ry="9" fill="#3b2f3a" opacity=".2" stroke="none"/>
+<!-- stone walls either side of the stairs -->
+<rect x="14" y="128" width="40" height="88" rx="4" fill="#cfc8d6"/><rect x="146" y="128" width="40" height="88" rx="4" fill="#cfc8d6"/>
+<path d="M14 150h40M14 172h40M14 194h40M146 150h40M146 172h40M146 194h40" stroke-width="1.5" opacity=".3"/>
+<!-- stairs going down -->
+<path d="M54 128h92v88H54z" fill="#2f2a38"/>
+<path d="M60 150h80M64 168h72M68 184h64M72 198h56" stroke="#8b83a0" stroke-width="3"/>
+<path d="M54 128l-0 88M146 128l0 88" stroke="#f48fb1" stroke-width="5"/>
+<!-- posts and globe lamps -->
+<path d="M24 100V128M176 100V128" stroke="#f48fb1" stroke-width="7"/>
+<circle class="g" cx="24" cy="86" r="24" fill="#ffd1e0" stroke="none"/><circle class="g" cx="176" cy="86" r="24" fill="#ffd1e0" stroke="none"/>
+<circle cx="24" cy="88" r="11" fill="#fdf6ec"/><circle cx="176" cy="88" r="11" fill="#fdf6ec"/>
+<!-- SUBWAY banner with a C bullet -->
+<rect x="14" y="98" width="172" height="36" rx="9" fill="#f48fb1"/>
+<circle cx="42" cy="116" r="17" fill="#fdf6ec"/><path d="M50 108.5A10.5 10.5 0 1 0 50 123.5" stroke="#f48fb1" stroke-width="6"/>
+<text x="68" y="123" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="#fdf6ec" stroke="#3b2f3a" stroke-width="1.2" paint-order="stroke">SUBWAY</text>
+<!-- big C bullet on a pole so it can be seen from afar -->
+<path d="M100 98V66" stroke="#3b2f3a" stroke-width="6"/>
+<g class="bullet"><circle cx="100" cy="38" r="31" fill="#f48fb1"/><path d="M114 22.5A19 19 0 1 0 114 53.5" stroke="#fdf6ec" stroke-width="10"/></g>
+<path class="arrow" d="M90 140l10 12 10-12" stroke="#fdf6ec" stroke-width="5"/>
 </svg>

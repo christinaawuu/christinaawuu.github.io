@@ -157,3 +157,35 @@ body.night .city-hint, body.night .hud-world { background: rgba(253,246,236,.95)
 .scene .walker { pointer-events: none; }
 .scene .pigeon.fly svg { animation: flap .85s ease-out; }
 @keyframes flap { 0% { transform: translateY(0) scale(1); } 40% { transform: translateY(-34px) scale(1.15) rotate(-10deg); } 100% { transform: translateY(0) scale(1); } }
+
+/* ---------- resume viewer, contact form, vendor bubble ---------- */
+.panel.wide { max-width: min(900px, 94vw); width: 94vw; }
+.resume-panel .pdf { width: 100%; height: min(68vh, 760px); border: 2px solid #e6dcc8; border-radius: 12px; margin-top: 14px; background: #fff; }
+.resume-panel .hint, .contact-panel .muted { color: var(--muted); font-size: .85rem; margin: 8px 0 0; }
+.btn.alt { background: #fff; color: var(--ink); border: 2px solid var(--accent); }
+.contact-form { display: grid; gap: 12px; margin-top: 14px; }
+.contact-form label { display: grid; gap: 4px; font-weight: 800; font-size: .85rem; }
+.contact-form input, .contact-form textarea { font: inherit; font-weight: 600; padding: 10px 12px; border-radius: 12px; border: 2px solid #e6dcc8; background: #fffdf9; color: var(--ink); }
+.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent); }
+.contact-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.form-actions .btn { border: 2px solid var(--accent); cursor: pointer; font: inherit; font-weight: 900; }
+.form-status { margin: 0; min-height: 1.2em; font-weight: 700; font-size: .9rem; color: var(--ink); }
+.scene .bubble { position: absolute; z-index: 95000; transform: translate(-50%, -100%) scale(.8); background: #fff; border: 3px solid #3b2f3a; border-radius: 14px; padding: 4px 10px; font-weight: 900; font-size: 13px; white-space: nowrap; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+.scene .bubble.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+
+/* ---------- map polish ---------- */
+.city::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 62%, rgba(30,50,90,.28) 100%); }
+.city-compass { position: absolute; right: 14px; top: 14px; width: 62px; height: 62px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); pointer-events: none; }
+.zoomed-only { display: none; }
+.city.zoomed .zoomed-only { display: inline; }
+.city.zoomed g.zoomed-only { display: inline; }
+.city-street-label { font: 800 15px 'Nunito','Segoe UI',system-ui,sans-serif; letter-spacing: 4px; fill: #6d6578; opacity: .8; paint-order: stroke; stroke: #f6ecd6; stroke-width: 4px; }
+.cloud { animation: drift linear infinite; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(4200px); } }
+.c-flow { animation: cflow 1.6s linear infinite; }
+@keyframes cflow { to { stroke-dashoffset: -16; } }
+body.night .cloud { opacity: .35; }
+.city-hint { bottom: 70px; }
+@media (min-width: 701px) { .city-hint { bottom: 18px; } }
+@media (prefers-reduced-motion: reduce) { .cloud, .c-flow { animation: none !important; } }

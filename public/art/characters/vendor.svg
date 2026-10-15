@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 100" fill="none" stroke="#3b2f3a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+<style>.bob{animation:b 1.8s ease-in-out infinite}@keyframes b{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}.wave{animation:w 1.4s ease-in-out infinite;transform-origin:50px 56px}@keyframes w{0%,100%{transform:rotate(0)}50%{transform:rotate(-22deg)}}</style>
+<ellipse cx="32" cy="94" rx="19" ry="5" fill="#3b2f3a" opacity=".2" stroke="none"/>
+<g class="bob">
+<rect x="20" y="70" width="10" height="20" rx="4" fill="#4a4354"/><rect x="34" y="70" width="10" height="20" rx="4" fill="#4a4354"/>
+<rect x="17" y="86" width="14" height="8" rx="4" fill="#fdf6ec"/><rect x="33" y="86" width="14" height="8" rx="4" fill="#fdf6ec"/>
+<!-- body with apron -->
+<rect x="14" y="42" width="36" height="32" rx="11" fill="#6b7f94"/>
+<path d="M20 48h24v26H20z" fill="#fdf6ec"/><path d="M20 58h24M20 66h24" stroke="#e8505b" stroke-width="3"/>
+<rect x="6" y="46" width="9" height="20" rx="4.5" fill="#6b7f94"/>
+<g class="wave"><rect x="49" y="44" width="9" height="20" rx="4.5" fill="#6b7f94"/><circle cx="53.5" cy="44" r="4.5" fill="#f2c6a0"/></g>
+<circle cx="10.5" cy="68" r="4" fill="#f2c6a0"/>
+<!-- head, cap and mustache -->
+<circle cx="32" cy="28" r="17" fill="#f2c6a0"/>
+<path d="M14 24a18 14 0 0136 0z" fill="#e8505b"/><rect x="12" y="22" width="40" height="6" rx="3" fill="#c63d49"/>
+<circle cx="26" cy="31" r="2.2" fill="#3b2f3a" stroke="none"/><circle cx="38" cy="31" r="2.2" fill="#3b2f3a" stroke="none"/>
+<path d="M27 37q5 5 10 0" stroke-width="2.2"/>
+</g>
+</svg>
