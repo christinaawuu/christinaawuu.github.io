@@ -75,7 +75,7 @@ export function openResume(label: string, url: string): void {
   const href = esc(url);
   shell('wide resume-panel', `
     <h2>📄 ${esc(label)}</h2>
-    <div class="links"><a class="btn" href="${href}" target="_blank" rel="noopener">Open in a new tab</a><a class="btn alt" href="${href}" download>Download PDF</a></div>
+    <div class="links"><a class="btn" href="${href}" target="_blank" rel="noopener">Open in a new tab</a><a class="btn pink" href="${href}" download>⬇ Download PDF</a></div>
     <iframe class="pdf" src="${href}#view=FitH" title="${esc(label)}"></iframe>
     <p class="hint">If the preview doesn't show on your device, use the buttons above.</p>`);
 }

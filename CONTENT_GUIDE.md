@@ -145,6 +145,21 @@ You need Node.js (version 20 or newer) installed to preview. You do not need it 
 - Open the repo's **Actions** tab. A red X means the build failed, and its log says which file is wrong.
 - Locally, add `?drafts` to the preview URL to see draft entries.
 
-## Contact form
+## Contact form (so messages land in your inbox)
 
-By default the form opens the visitor's email app with the message filled in. To have messages arrive in your inbox without opening an email app, make a free form at formspree.io (or a similar service), then paste its URL into `"contactEndpoint"` in `content/site.json`. Leave it empty to keep the email-app behavior.
+By default the Contact form opens the visitor's email app with their message filled in. To have messages sent straight to your inbox instead, connect a free Formspree form:
+
+1. Go to https://formspree.io and create a free account.
+2. Click **+ New Form**. Name it "Portfolio contact" and set the email address that should receive messages (christina.wu.dev@gmail.com). Confirm the email Formspree sends you.
+3. Open the form's page and copy its endpoint URL. It looks like `https://formspree.io/f/abcdwxyz`.
+4. In this project open `content/site.json` and paste it into `contactEndpoint`:
+
+   ```json
+   "contactEndpoint": "https://formspree.io/f/abcdwxyz"
+   ```
+
+   You can do this on GitHub's website (open the file, click the pencil, edit, **Commit changes**), or locally with `git add -A`, `git commit`, `git push`.
+5. Wait about a minute for the site to redeploy, then open the live site, press **Contact**, and send yourself a test message. The first submission may ask you to confirm in Formspree. Check your spam folder too.
+6. Optional but recommended: in Formspree, open the form's **Settings** and restrict it to your site's domain (`christinaawuu.github.io`), so other sites cannot use your form. The form already has a hidden spam trap built in.
+
+Leave `contactEndpoint` as `""` to go back to the email-app behavior. If Formspree ever fails, the form falls back to opening the visitor's email app, so no message is lost.

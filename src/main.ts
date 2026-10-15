@@ -64,8 +64,8 @@ function renderHud(mode: 'city' | 'scene' | 'career', category?: Category): void
   }
 }
 
-function stopScene(): void {
-  scene?.destroy();
+function stopScene(fade = false): void {
+  if (fade) scene?.leave(); else scene?.destroy();
   scene = null;
 }
 
@@ -107,12 +107,12 @@ function route(): void {
       sign: (info) => openSign(info),
     });
     renderHud('scene', cat);
-    window.setTimeout(() => city?.hide(), 450); // the scene fades in over the map
+    window.setTimeout(() => city?.hide(), 1100); // the scene fades in over the map, which keeps gliding underneath
     return;
   }
 
   const from = sceneCategory ?? undefined;
-  stopScene();
+  stopScene(true); // fade out while the map zooms back out
   sceneCategory = null;
   city.show(from);
   renderHud('city');

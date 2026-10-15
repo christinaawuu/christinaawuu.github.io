@@ -8,7 +8,7 @@ export interface SceneCallbacks {
   open: (entry: Project) => void;
   sign: (info: SignInfo) => void;
 }
-export interface SceneHandle { destroy(): void }
+export interface SceneHandle { destroy(): void; /** fade out, then remove */ leave(): void }
 
 const BW = 560, BH = 420; // block size
 const AW = 170, SH = 150; // avenue (vertical road) width, street (horizontal road) height
@@ -157,7 +157,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
 
   entries.forEach((entry, idx) => {
     const { x: bx, y: by } = blockPos(idx);
-    const bottom = by + BH - 70;
+    const bottom = by + BH - 150; // set well back from the street so the sign and station never cover it
     let node: HTMLElement, tagTop: number, tagLeft: number, lx: number;
     let rect: [number, number, number, number];
 
@@ -335,14 +335,16 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
   /* ---------- camera ---------- */
   let userZoom = 1, baseScale = 1, cover = 0.3;
   let scale = 1, camX = 0, camY = 0;
-  const applyZoom = () => { scale = Math.max(cover, Math.min(2.4, baseScale * userZoom)); };
+  let targetScale = 1;
+  const applyZoom = () => { targetScale = Math.max(cover, Math.min(2.4, baseScale * userZoom)); };
   const resize = () => {
     const base = Math.max(0.55, Math.min(1.15, innerWidth / 1100));
     cover = Math.max(innerHeight / (H + 2 * M), innerWidth / (W + 2 * M)); // never zoom out past the backdrop
     baseScale = Math.max(base, Math.min(1.4, cover));
     applyZoom();
+    scale = targetScale;
   };
-  const zoomBy = (f: number) => { scale = Math.max(cover, Math.min(2.4, scale * f)); userZoom = scale / baseScale; };
+  const zoomBy = (f: number) => { targetScale = Math.max(cover, Math.min(2.4, targetScale * f)); userZoom = targetScale / baseScale; };
   window.addEventListener('resize', resize);
   resize();
   function camera() {
@@ -463,6 +465,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     if (!alive) return;
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
+    scale += (targetScale - scale) * (1 - Math.exp(-dt * 9)); // glide toward the zoom target
     let dx = (keys.has('d') ? 1 : 0) - (keys.has('a') ? 1 : 0);
     let dy = (keys.has('s') ? 1 : 0) - (keys.has('w') ? 1 : 0);
     if (dx || dy) player.target = null;
@@ -544,7 +547,19 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
   // short welcome toast
   say(`${nb.icon} ${nb.name}: ${nb.blurb}`);
 
+  const teardown = () => {
+    alive = false;
+    clearTimeout(toastTimer);
+    window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('keyup', onKeyUp);
+    window.removeEventListener('resize', resize);
+  };
   return {
+    leave() {
+      teardown();
+      stage.classList.add('leaving');
+      setTimeout(() => stage.remove(), 700);
+    },
     destroy() {
       alive = false;
       clearTimeout(toastTimer);

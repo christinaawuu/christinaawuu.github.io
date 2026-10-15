@@ -35,13 +35,13 @@ export interface Neighborhood {
 export const NEIGHBORHOODS: Neighborhood[] = [
   { category: 'games', name: 'Times Square', label: 'Games', blurb: 'Games I have built', color: '#e8505b', icon: '🎮', building: 'arcade', buildingH: 260, lot: '#efe7d6', ll: [40.758, -73.9855], labelSide: 'l' },
   { category: 'playtesting', name: 'Chelsea', label: 'Playtesting & Research', blurb: 'Professional playtesting and player research', color: '#4f9d8f', icon: '🧪', building: 'lab', buildingH: 260, lot: '#e9eee4', ll: [40.7465, -74.0014], labelSide: 'l' },
-  { category: 'engineering', name: 'Financial District', label: 'Software Engineering', blurb: 'Software engineering and data', color: '#4c7bd9', icon: '💻', building: 'bank', buildingH: 260, lot: '#e6e4ec', ll: [40.7075, -74.0113], labelSide: 'l' },
+  { category: 'engineering', name: 'Financial District', label: 'Software Engineering', blurb: 'Software engineering and data', color: '#4c7bd9', icon: '💻', building: 'bank', buildingH: 260, lot: '#e6e4ec', ll: [40.7092, -74.0085], labelSide: 'l' },
   { category: 'apps', name: 'Flatiron', label: 'Apps & Web', blurb: 'iOS apps and websites', color: '#3fa7c4', icon: '📱', building: 'flatiron', buildingH: 320, lot: '#e8efee', ll: [40.7411, -73.9897], labelSide: 'r' },
-  { category: 'modeling', name: 'DUMBO', label: '3D & Animation', blurb: 'Maya: 3D modeling, rendering, and animation', color: '#9a6fd1', icon: '🧊', building: 'warehouse', buildingH: 280, lot: '#d8c9b3', ll: [40.7033, -73.9881], labelSide: 'r' },
-  { category: 'design', name: 'SoHo', label: 'Design & Marketing', blurb: 'Design and marketing', color: '#e9a23b', icon: '🎨', building: 'gallery', buildingH: 260, lot: '#eee2cc', ll: [40.7233, -74.003], labelSide: 'l' },
-  { category: 'experience', name: 'Midtown', label: 'Experience', blurb: 'Work experience', color: '#6b7f94', icon: '💼', building: 'office', buildingH: 300, lot: '#e4e6ea', ll: [40.7549, -73.9707], labelSide: 'r' },
+  { category: 'modeling', name: 'DUMBO', label: '3D & Animation', blurb: 'Maya: 3D modeling, rendering, and animation', color: '#9a6fd1', icon: '🧊', building: 'warehouse', buildingH: 280, lot: '#d8c9b3', ll: [40.7035, -73.9935], labelSide: 'r' },
+  { category: 'design', name: 'SoHo', label: 'Design & Marketing', blurb: 'Design and marketing', color: '#e9a23b', icon: '🎨', building: 'gallery', buildingH: 260, lot: '#eee2cc', ll: [40.7228, -74.0025], labelSide: 'l' },
+  { category: 'experience', name: 'Midtown', label: 'Experience', blurb: 'Work experience', color: '#6b7f94', icon: '💼', building: 'office', buildingH: 300, lot: '#e4e6ea', ll: [40.7646, -73.977], labelSide: 'r' },
   { category: 'involvement', name: 'Union Square', label: 'Leadership & Involvement', blurb: 'Leadership and community involvement', color: '#d9708c', icon: '🤝', building: 'hall', buildingH: 260, lot: '#efe3e3', ll: [40.7359, -73.9911], labelSide: 'l' },
-  { category: 'spots', name: 'Brooklyn', label: 'Hobbies', blurb: 'My Brooklyn: where I bike, work out, picnic, and eat', color: '#2f7d5b', icon: '🏠', building: 'bodega', buildingH: 240, lot: '#e8efdf', ll: [40.6735, -73.9905], labelSide: 'l' },
+  { category: 'spots', name: 'Brooklyn', label: 'Hobbies', blurb: 'My Brooklyn: where I bike, work out, picnic, and eat', color: '#2f7d5b', icon: '🏠', building: 'bodega', buildingH: 240, lot: '#e8efdf', ll: [40.6602, -73.9695], labelSide: 'r' },
 ];
 
 export const neighborhoodFor = (c: Category): Neighborhood =>
@@ -60,4 +60,4 @@ export const CAREER_ORDER: Category[] = [
 ];
 
 /** The "About me" pin: a general spot in Brooklyn, not an address. */
-export const HOME_LL: [number, number] = [40.6785, -73.977];
+export const HOME_LL: [number, number] = [40.675, -73.9735];

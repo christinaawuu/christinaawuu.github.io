@@ -73,13 +73,32 @@ const NJ: [number, number][] = [
   [40.64, -74.065], [40.62, -74.08], [40.55, -74.12], [40.55, -74.3], [40.95, -74.3],
 ];
 const CENTRAL_PARK: [number, number][] = [[40.7677, -73.9818], [40.7644, -73.9731], [40.7968, -73.9519], [40.8003, -73.9581]];
-const PROSPECT_PARK: [number, number][] = [[40.6746, -73.9695], [40.665, -73.9783], [40.6545, -73.9734], [40.6535, -73.968], [40.664, -73.9622], [40.67, -73.9625]];
+function scaleAround(pts: [number, number][], k: number): [number, number][] {
+  const la = pts.reduce((a, p) => a + p[0], 0) / pts.length, lo = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+  return pts.map(([y, x]) => [la + (y - la) * k, lo + (x - lo) * k]);
+}
+// Prospect Park, drawn bigger than life so Brooklyn has room to hold the hobbies
+const PROSPECT_PARK = scaleAround([[40.6746, -73.9695], [40.665, -73.9783], [40.6545, -73.9734], [40.6535, -73.968], [40.664, -73.9622], [40.67, -73.9625]], 1.7);
 const BRIDGES: { a: [number, number]; b: [number, number] }[] = [
-  { a: [40.712, -73.9995], b: [40.7033, -73.993] }, // Brooklyn Bridge
-  { a: [40.7155, -73.9915], b: [40.7055, -73.9895] }, // Manhattan Bridge
+  { a: [40.7122, -74.0003], b: [40.7005, -73.9965] }, // Brooklyn Bridge
+  { a: [40.7157, -73.9922], b: [40.7035, -73.9903] }, // Manhattan Bridge
   { a: [40.7145, -73.9777], b: [40.7115, -73.9627] }, // Williamsburg Bridge
   { a: [40.7577, -73.961], b: [40.7539, -73.9387] }, // Queensboro Bridge
 ];
+
+const PINK = '#f48fb1';
+const LILAC = '#b794f6'; // the W line: C and W, for Christina Wu
+const ICONS_LL: [number, number][] = [[40.7484, -73.9857], [40.7516, -73.9755], [40.7127, -74.0134]];
+/** which of my two lines serve each neighborhood */
+const SERVED: Record<string, ('C' | 'W')[]> = {
+  games: ['C', 'W'], playtesting: ['C'], engineering: ['C', 'W'], apps: ['W'], modeling: ['C'], design: ['C', 'W'], experience: ['W'], involvement: ['W'], spots: ['C'],
+};
+const bulletSvg = (r: number, line: 'C' | 'W') => {
+  const letter = line === 'C'
+    ? `<path d="M${(r * 0.45).toFixed(1)} ${(-r * 0.5).toFixed(1)}A${(r * 0.58).toFixed(1)} ${(r * 0.58).toFixed(1)} 0 1 0 ${(r * 0.45).toFixed(1)} ${(r * 0.5).toFixed(1)}" fill="none" stroke="#fdf6ec" stroke-width="${(r * 0.3).toFixed(1)}" stroke-linecap="round"/>`
+    : `<path d="M${(-r * 0.6).toFixed(1)} ${(-r * 0.45).toFixed(1)}L${(-r * 0.3).toFixed(1)} ${(r * 0.5).toFixed(1)}L0 ${(-r * 0.1).toFixed(1)}L${(r * 0.3).toFixed(1)} ${(r * 0.5).toFixed(1)}L${(r * 0.6).toFixed(1)} ${(-r * 0.45).toFixed(1)}" fill="none" stroke="#fdf6ec" stroke-width="${(r * 0.26).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<circle r="${r}" fill="${line === 'C' ? PINK : LILAC}" stroke="#3b2f3a" stroke-width="3"/>${letter}`;
+};
 
 export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   const wrap = document.createElement('div');
@@ -93,7 +112,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   // hobby spots now live inside the Brooklyn neighborhood; only the About me pin sits on the map
   const pins: { slug: string; entry?: Project; x: number; y: number; pos: { icon: string } }[] = [];
   const home = about ? { entry: about, ...xy(HOME_LL) } : null;
-  const keepClear: P[] = [...beacons, ...pins, ...(home ? [home] : [])];
+  const keepClear: P[] = [...beacons, ...pins, ...(home ? [home] : []), ...ICONS_LL.map(xy)];
 
   /* ---------- decoration: tiny buildings ---------- */
   const parkPts = (poly: [number, number][]) => poly.map(xy);
@@ -134,6 +153,20 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
         if (dr() < 0.45 || !inside(ring, px, py) || inPark(px, py) || near(px, py, 52)) continue;
         const h = 16 + dr() * 16;
         bldgs.push({ x: px, y: py, w: h * 0.66, h, c: pick() });
+      }
+    }
+  }
+  // Downtown Brooklyn: a cluster of high-rises
+  {
+    const dtb = xy([40.6925, -73.989]);
+    for (let dx = -120; dx <= 120; dx += 22) {
+      for (let dy = -100; dy <= 100; dy += 20) {
+        const d = Math.hypot(dx, dy);
+        if (d > 125) continue;
+        const x = dtb.x + dx + (dr() - 0.5) * 8, y = dtb.y + dy + (dr() - 0.5) * 8;
+        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 50)) continue;
+        const h = 38 + dr() * 30 - d * 0.12;
+        bldgs.push({ x, y, w: h * 0.62, h, c: pick() });
       }
     }
   }
@@ -205,6 +238,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
         <ellipse class="pulse" rx="30" ry="14" fill="none" stroke="${n.color}" stroke-width="4"/>
         <ellipse rx="22" ry="10" fill="${n.color}" opacity=".9" stroke="#3b2f3a" stroke-width="3"/>
         <circle cy="-4" r="7" fill="#fff6c8" stroke="#3b2f3a" stroke-width="2.5"/>
+        ${(SERVED[b.category] ?? []).map((l, i, a) => `<g transform="translate(${(i - (a.length - 1) / 2) * 26} 28)">${bulletSvg(11, l)}</g>`).join('')}
         ${pill(n.icon, `${n.name} · ${count}`, n.color, n.labelSide)}</g>`;
     })
     .join('');
@@ -234,37 +268,44 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
     .join('');
 
 
-  /* ---------- polish: the C train, more parks, landmarks, clouds ---------- */
-  const PINKLINE = '#f48fb1';
+  /* ---------- polish: the C and W trains, more parks, landmarks, clouds ---------- */
+  const NB = Object.fromEntries(NEIGHBORHOODS.map((n) => [n.category, n.ll])) as Record<string, [number, number]>;
+  // Stylized routes that run through the neighborhoods each line really serves.
   const C_LINE: [number, number][] = [
-    [40.8407, -73.94], [40.8277, -73.9442], [40.8, -73.9582], [40.7916, -73.9645], [40.7814, -73.9722], [40.7683, -73.9819], [40.7573, -73.9898],
-    [40.7523, -73.9933], [40.7457, -73.9987], [40.741, -74.0013], [40.7326, -74.0003], [40.7227, -74.0049], [40.7131, -74.0093], [40.7102, -74.0075],
-    [40.6993, -73.9905], [40.6924, -73.9873], [40.6884, -73.9851], [40.6866, -73.9738], [40.6832, -73.9658], [40.6811, -73.9564], [40.6797, -73.9411], [40.679, -73.93],
+    [40.8407, -73.94], [40.8277, -73.9442], [40.8004, -73.9582], [40.7916, -73.9645], [40.7814, -73.9722], [40.7683, -73.9819], NB.games,
+    [40.7573, -73.9898], [40.7523, -73.9933], NB.playtesting, [40.7326, -74.0003], NB.design, [40.7131, -74.0093], NB.engineering, NB.modeling,
+    [40.6993, -73.9905], [40.6924, -73.9873], [40.6884, -73.9851], [40.6745, -73.9765], NB.spots,
   ];
-  const C_STATIONS: { ll: [number, number]; name: string; bullet?: boolean }[] = [
-    { ll: [40.7683, -73.9819], name: 'Columbus Circle', bullet: true },
-    { ll: [40.7573, -73.9898], name: 'Port Authority' },
-    { ll: [40.7523, -73.9933], name: '34 St-Penn Station', bullet: true },
-    { ll: [40.741, -74.0013], name: '14 St' },
-    { ll: [40.7326, -74.0003], name: 'W 4 St' },
-    { ll: [40.7131, -74.0093], name: 'Chambers St' },
-    { ll: [40.7102, -74.0075], name: 'Fulton St', bullet: true },
-    { ll: [40.6993, -73.9905], name: 'High St' },
-    { ll: [40.6884, -73.9851], name: 'Hoyt-Schermerhorn' },
-    { ll: [40.6832, -73.9658], name: 'Clinton-Washington' },
+  const W_LINE: [number, number][] = [
+    [40.7508, -73.9402], [40.7627, -73.9676], [40.7647, -73.9732], NB.experience, [40.7646, -73.9807], [40.7599, -73.9843], NB.games,
+    [40.7497, -73.9877], NB.apps, NB.involvement, [40.7304, -73.9925], [40.7243, -73.9977], NB.design, [40.7133, -74.0069], NB.engineering, [40.703, -74.0129],
   ];
-  const cPts = C_LINE.map(xy);
-  const cPath = 'M' + cPts.map((q) => `${q.x.toFixed(0)} ${q.y.toFixed(0)}`).join('L');
-  const bullet = (r: number) => `<circle r="${r}" fill="${PINKLINE}" stroke="#3b2f3a" stroke-width="3"/><path d="M${(r * 0.45).toFixed(1)} ${(-r * 0.5).toFixed(1)}A${(r * 0.58).toFixed(1)} ${(r * 0.58).toFixed(1)} 0 1 0 ${(r * 0.45).toFixed(1)} ${(r * 0.5).toFixed(1)}" fill="none" stroke="#fdf6ec" stroke-width="${(r * 0.3).toFixed(1)}" stroke-linecap="round"/>`;
+  const STOPS: { ll: [number, number]; name: string; line: 'C' | 'W' }[] = [
+    { ll: [40.7683, -73.9819], name: 'Columbus Circle', line: 'C' }, { ll: [40.7573, -73.9898], name: 'Port Authority', line: 'C' },
+    { ll: [40.7523, -73.9933], name: '34 St-Penn Station', line: 'C' }, { ll: [40.7326, -74.0003], name: 'W 4 St', line: 'C' },
+    { ll: [40.7131, -74.0093], name: 'Chambers St', line: 'C' }, { ll: [40.6993, -73.9905], name: 'High St', line: 'C' },
+    { ll: [40.6884, -73.9851], name: 'Hoyt-Schermerhorn', line: 'C' }, { ll: [40.6745, -73.9765], name: 'Grand Army Plaza', line: 'C' },
+    { ll: [40.7508, -73.9402], name: 'Queensboro Plaza', line: 'W' }, { ll: [40.7627, -73.9676], name: 'Lexington Av/59 St', line: 'W' },
+    { ll: [40.7647, -73.9732], name: '5 Av/59 St', line: 'W' }, { ll: [40.7646, -73.9807], name: '57 St-7 Av', line: 'W' },
+    { ll: [40.7497, -73.9877], name: '34 St-Herald Sq', line: 'W' }, { ll: [40.7304, -73.9925], name: '8 St-NYU', line: 'W' },
+    { ll: [40.7243, -73.9977], name: 'Prince St', line: 'W' }, { ll: [40.7133, -74.0069], name: 'City Hall', line: 'W' }, { ll: [40.703, -74.0129], name: 'Whitehall St', line: 'W' },
+  ];
+  const pathOf = (pts: [number, number][]) => 'M' + pts.map(xy).map((q) => `${q.x.toFixed(0)} ${q.y.toFixed(0)}`).join('L');
+  const cPath = pathOf(C_LINE), wPath = pathOf(W_LINE);
+  const lineSvg = (d: string, color: string) => `
+    <path d="${d}" fill="none" stroke="#3b2f3a" stroke-width="11" stroke-linejoin="round" stroke-linecap="round" opacity=".85"/>
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${d}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 14" stroke-linecap="round" class="c-flow"/>`;
+  const endBullet = (ll: [number, number], line: 'C' | 'W') => { const q = xy(ll); return `<g transform="translate(${q.x.toFixed(0)} ${(q.y - 26).toFixed(0)})">${bulletSvg(14, line)}</g>`; };
   const cLineSvg = `
-    <path d="${cPath}" fill="none" stroke="#3b2f3a" stroke-width="11" stroke-linejoin="round" stroke-linecap="round" opacity=".85"/>
-    <path d="${cPath}" fill="none" stroke="${PINKLINE}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="${cPath}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 14" stroke-linecap="round" class="c-flow"/>
-    ${C_STATIONS.map((st) => {
+    ${lineSvg(cPath, PINK)}${lineSvg(wPath, LILAC)}
+    ${STOPS.map((st) => {
       const q = xy(st.ll);
-      return `<g transform="translate(${q.x.toFixed(0)} ${q.y.toFixed(0)})"><circle r="8" fill="#fdf6ec" stroke="#3b2f3a" stroke-width="3"/>${st.bullet ? `<g transform="translate(0 -24)">${bullet(13)}</g>` : ''}
-        <g class="lbl zoomed-only" data-off="${st.bullet ? 44 : 20}"><rect x="-70" y="-11" width="140" height="22" rx="11" fill="#fff" stroke="${PINKLINE}" stroke-width="2.5"/><text y="4.5" text-anchor="middle" class="city-label-text small">${esc(st.name)}</text></g></g>`;
-    }).join('')}`;
+      const color = st.line === 'C' ? PINK : LILAC;
+      return `<g transform="translate(${q.x.toFixed(0)} ${q.y.toFixed(0)})"><circle r="6" fill="#fdf6ec" stroke="#3b2f3a" stroke-width="3"/>
+        <g class="lbl zoomed-far" data-off="16"><rect x="-62" y="-10" width="124" height="20" rx="10" fill="#fff" stroke="${color}" stroke-width="2.5"/><text y="4" text-anchor="middle" class="city-label-text tiny">${esc(st.name)}</text></g></g>`;
+    }).join('')}
+    ${endBullet(C_LINE[0], 'C')}${endBullet(NB.spots, 'C')}${endBullet(W_LINE[0], 'W')}${endBullet(W_LINE[W_LINE.length - 1], 'W')}`;
 
   const blob = (ll: [number, number], rx: number, ry: number, rot = ANGLE) => {
     const q = xy(ll);
@@ -277,7 +318,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
 
   const icon = (ll: [number, number], name: string, art: string) => {
     const q = xy(ll);
-    return `<g transform="translate(${q.x.toFixed(0)} ${q.y.toFixed(0)})" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round">${art}
+    return `<g transform="translate(${q.x.toFixed(0)} ${q.y.toFixed(0)})" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round"><g transform="scale(1.6)">${art}</g>
       <g class="lbl zoomed-only" data-off="14"><rect x="-80" y="-11" width="160" height="22" rx="11" fill="#fff" stroke="#3b2f3a" stroke-width="2"/><text y="4.5" text-anchor="middle" class="city-label-text small">${esc(name)}</text></g></g>`;
   };
   const landmarkIcons = [
@@ -322,12 +363,12 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
         ${streetLabels}
         ${label([40.775, -74.03], 'HUDSON RIVER', -61)}${label([40.77, -73.935], 'EAST RIVER', -61)}${label([40.62, -74.03], 'UPPER BAY', 0)}
         ${label([40.67, -73.93], 'BROOKLYN', 0)}${label([40.755, -73.88], 'QUEENS', 0)}${label([40.83, -73.9], 'THE BRONX', 0)}${label([40.74, -74.065], 'NEW JERSEY', -61)}
-        ${label([40.786, -73.966], 'CENTRAL PARK', -61, 'city-park-label')}${label([40.659, -73.969], 'PROSPECT PARK', -61, 'city-park-label')}
+        ${label([40.786, -73.966], 'CENTRAL PARK', -61, 'city-park-label')}${label([40.6445, -73.9695], 'PROSPECT PARK', 0, 'city-park-label')}
         <g transform="translate(${statue.x.toFixed(0)} ${statue.y.toFixed(0)})" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round">
           <ellipse cy="16" rx="22" ry="9" fill="#cdbf9f"/><rect x="-8" y="-4" width="16" height="20" fill="#b9c9bb"/><path d="M-12 -4l12-26 12 26z" fill="#8fc7ae"/><path d="M10 -22l8-14" stroke-width="4"/><circle cx="19" cy="-39" r="5" fill="#ffd36e"/></g>
-        ${landmarkIcons}
         ${boat([40.757, -74.0155], 'b1', '#e8505b')}${boat([40.727, -73.9715], 'b2', '#f6c453')}${boat([40.665, -74.035], 'b3', '#4f9d8f')}
         ${bldgSvg}
+        ${landmarkIcons}
         <rect class="night-rect" x="-4000" y="-4000" width="12000" height="12000" fill="#3c4a8c" opacity="0" style="mix-blend-mode:multiply;pointer-events:none"/>
         ${pinSvg}
         ${beaconSvg}
@@ -353,6 +394,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   function apply(): void {
     cam.setAttribute('transform', `translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${s.toFixed(4)})`);
     wrap.classList.toggle('zoomed', s >= fit * 2.2);
+    wrap.classList.toggle('zoomed-far', s >= fit * 4);
     const k = 1 / s;
     for (const l of labels) l.setAttribute('transform', `scale(${k.toFixed(4)}) translate(0 ${-Number(l.dataset.off)})`);
   }
@@ -389,10 +431,41 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
     ty = cy - ((cy - ty) * ns) / s;
     s = ns; clampPan(); apply();
   }
-  const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const ease = (x: number) => (1 - Math.cos(Math.PI * x)) / 2; // gentle in and out
   let anim = 0;
-  function animateTo(ns: number, cx: number, cy: number, ms: number): Promise<void> {
+  // wheel and button zooms glide toward a target instead of jumping
+  let tgt: { s: number; tx: number; ty: number } | null = null;
+  let smoothRaf = 0;
+  const stopSmooth = () => { cancelAnimationFrame(smoothRaf); smoothRaf = 0; tgt = null; };
+  function zoomTarget(cx: number, cy: number, factor: number): void {
     cancelAnimationFrame(anim);
+    const base = tgt ?? { s, tx, ty };
+    const ns = Math.min(maxZoom(), Math.max(fit, base.s * factor));
+    let ntx = cx - ((cx - base.tx) * ns) / base.s, nty = cy - ((cy - base.ty) * ns) / base.s;
+    const mw = MAP_W * ns, mh = MAP_H * ns;
+    ntx = mw <= vw ? (vw - mw) / 2 : Math.min(vw * 0.35, Math.max(vw * 0.65 - mw, ntx));
+    nty = mh <= vh ? (vh - mh) / 2 : Math.min(vh * 0.35, Math.max(vh * 0.65 - mh, nty));
+    tgt = { s: ns, tx: ntx, ty: nty };
+    if (smoothRaf) return;
+    let last = performance.now();
+    const step = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (!tgt) { smoothRaf = 0; return; }
+      const k = 1 - Math.exp(-dt * 9);
+      s += (tgt.s - s) * k; tx += (tgt.tx - tx) * k; ty += (tgt.ty - ty) * k;
+      apply();
+      if (Math.abs(tgt.s - s) < 0.0008 && Math.abs(tgt.tx - tx) < 0.4 && Math.abs(tgt.ty - ty) < 0.4) {
+        s = tgt.s; tx = tgt.tx; ty = tgt.ty; tgt = null; smoothRaf = 0; apply(); afterZoom();
+        return;
+      }
+      smoothRaf = requestAnimationFrame(step);
+    };
+    smoothRaf = requestAnimationFrame(step);
+  }
+  function animateTo(ns: number, cx: number, cy: number, ms: number, onProgress?: (k: number) => void): Promise<void> {
+    cancelAnimationFrame(anim);
+    stopSmooth();
     const s0 = s, tx0 = tx, ty0 = ty;
     const tx1 = vw / 2 - cx * ns, ty1 = vh / 2 - cy * ns;
     const t0 = performance.now();
@@ -402,6 +475,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
         s = s0 * Math.pow(ns / s0, e);
         tx = tx0 + (tx1 - tx0) * e; ty = ty0 + (ty1 - ty0) * e;
         apply();
+        onProgress?.(k);
         if (k < 1) anim = requestAnimationFrame(tick); else resolve();
       };
       anim = requestAnimationFrame(tick);
@@ -411,8 +485,10 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
 
   async function flyInto(cat: Category): Promise<void> {
     const b = beaconOf(cat);
-    await animateTo(fit * 5.2, b.x, b.y - 40, 750);
-    cb.enter(cat);
+    // the neighborhood fades in while the camera is still gliding, so there is no hard cut
+    let entered = false;
+    await animateTo(fit * 5.2, b.x, b.y - 40, 1400, (k) => { if (!entered && k > 0.62) { entered = true; cb.enter(cat); } });
+    if (!entered) cb.enter(cat);
   }
 
   /* ---------- input ---------- */
@@ -437,6 +513,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
 
   svg.addEventListener('pointerdown', (e) => {
     cancelAnimationFrame(anim);
+    stopSmooth();
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.size === 1) drag = { sx: e.clientX, sy: e.clientY, tx, ty, moved: false, target: e.target as Element };
     else {
@@ -476,15 +553,13 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   svg.addEventListener('pointercancel', end);
   svg.addEventListener('wheel', (e) => {
     e.preventDefault();
-    cancelAnimationFrame(anim);
-    zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0016));
-    afterZoom();
+    zoomTarget(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0016));
   }, { passive: false });
   wrap.querySelector('.city-zoom')!.addEventListener('click', (e) => {
     const dir = (e.target as HTMLElement).closest<HTMLElement>('[data-zoom]')?.dataset.zoom;
     if (!dir) return;
-    if (dir === 'fit') { void animateTo(fit, FOCUS.x + FOCUS.w / 2, FOCUS.y + FOCUS.h / 2, 450); return; }
-    void animateTo(Math.min(maxZoom(), Math.max(fit, s * (dir === 'in' ? 1.7 : 1 / 1.7))), (vw / 2 - tx) / s, (vh / 2 - ty) / s, 280).then(afterZoom);
+    if (dir === 'fit') { void animateTo(fit, FOCUS.x + FOCUS.w / 2, FOCUS.y + FOCUS.h / 2, 900); return; }
+    zoomTarget(vw / 2, vh / 2, dir === 'in' ? 1.8 : 1 / 1.8);
   });
 
   function tap(target: Element): void {
@@ -514,10 +589,10 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
       if (from) {
         const b = beaconOf(from);
         centerOn(b.x, b.y - 40, fit * 5.2);
-        void animateTo(fit, FOCUS.x + FOCUS.w / 2, FOCUS.y + FOCUS.h / 2, 800);
+        void animateTo(fit, FOCUS.x + FOCUS.w / 2, FOCUS.y + FOCUS.h / 2, 1300);
       }
     },
-    hide() { cancelAnimationFrame(anim); wrap.style.display = 'none'; },
+    hide() { cancelAnimationFrame(anim); stopSmooth(); wrap.style.display = 'none'; },
     destroy() { cancelAnimationFrame(anim); clearTimeout(settle); ro.disconnect(); wrap.remove(); },
   };
 }
