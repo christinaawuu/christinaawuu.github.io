@@ -4,7 +4,7 @@ import { renderCareer } from './career';
 import { siteInfo, worldEntries } from './content';
 import { NEIGHBORHOODS, neighborhoodFor, type Category } from './neighborhoods';
 import { openProject, openSign } from './panel';
-import { esc } from './util';
+import { asset, esc } from './util';
 import { createCity, type CityHandle } from './world/city';
 import { createScene, type SceneHandle } from './world/scene';
 
@@ -25,6 +25,12 @@ let sceneCategory: Category | null = null;
 let toastTimer = 0;
 let careerCleanup: (() => void) | null = null;
 
+// day / night: follows the visitor's clock until they press the toggle
+const saved = localStorage.getItem('theme');
+const hour = new Date().getHours();
+const setNight = (on: boolean) => document.body.classList.toggle('night', on);
+setNight(saved ? saved === 'night' : hour < 6 || hour >= 19);
+
 function toast(msg: string): void {
   toastEl.textContent = msg;
   toastEl.style.display = 'block';
@@ -39,16 +45,22 @@ function renderHud(mode: 'city' | 'scene' | 'career', category?: Category): void
   if (mode === 'career') {
     hud.className = 'hud-career';
     hud.innerHTML = `<a class="brand" href="#/career" data-scroll="top">${esc(siteInfo.name)}</a>
-      <div class="anchors"><a href="#/career" data-scroll="experience">Experience</a><a href="#/career" data-scroll="skills">Skills</a><a href="#/career" data-scroll="projects">Work</a></div>${nav}`;
+      <div class="anchors"><a href="#/career" data-scroll="experience">Experience</a><a href="#/career" data-scroll="skills">Skills</a><a href="#/career" data-scroll="projects">Work</a><a href="#/career" data-scroll="contact">Contact</a></div>${nav}`;
     return;
   }
   hud.className = 'hud-world';
+  const resume = siteInfo.resumes?.[0];
+  const tools = `<div class="hud-tools">
+    ${resume ? `<a href="${esc(asset(resume.url))}" target="_blank" rel="noopener">📄 Resume</a>` : ''}
+    ${siteInfo.email ? `<a href="mailto:${esc(siteInfo.email)}">✉️ Contact</a>` : ''}
+    <button class="night-toggle" aria-label="Switch between day and night">${document.body.classList.contains('night') ? '☀️ Day' : '🌙 Night'}</button>
+  </div>`;
   if (mode === 'scene' && category) {
     const n = neighborhoodFor(category);
     hud.innerHTML = `<h1>${n.icon} ${esc(n.name)}</h1><p>${esc(n.blurb)}. Walk with WASD or the arrow keys, or tap to move. Press E at a building.</p>
-      <a class="hud-btn" href="#/explore">← NYC map</a>${nav}`;
+      <a class="hud-btn" href="#/explore">← NYC map</a>${nav}${tools}`;
   } else {
-    hud.innerHTML = `<h1>${esc(siteInfo.name)}'s NYC</h1><p>${esc(siteInfo.tagline)}</p>${nav}`;
+    hud.innerHTML = `<h1>${esc(siteInfo.name)}'s NYC</h1><p>${esc(siteInfo.tagline)}</p>${nav}${tools}`;
   }
 }
 
@@ -112,6 +124,14 @@ hud.addEventListener('click', (e) => {
   if (!a || !location.hash.startsWith('#/career')) return;
   e.preventDefault();
   document.getElementById(`career-${a.dataset.scroll}`)?.scrollIntoView({ behavior: 'smooth' });
+});
+
+hud.addEventListener('click', (e) => {
+  if (!(e.target as HTMLElement).closest('.night-toggle')) return;
+  const on = !document.body.classList.contains('night');
+  setNight(on);
+  localStorage.setItem('theme', on ? 'night' : 'day');
+  (e.target as HTMLElement).closest('.night-toggle')!.textContent = on ? '☀️ Day' : '🌙 Night';
 });
 
 window.addEventListener('hashchange', route);

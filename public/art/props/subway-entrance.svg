@@ -6,10 +6,10 @@
 <path d="M38 136V104M52 136V104M66 136V104M80 136V104M94 136V104" stroke="#5b5566" stroke-width="2.5"/>
 <path d="M18 80h104" stroke-width="3.5"/>
 <!-- railings and lamps -->
-<path d="M20 80V50M120 80V50" stroke="#2f7d5b" stroke-width="5"/>
-<circle class="g" cx="20" cy="42" r="17" fill="#8be0a4" stroke="none"/><circle class="g" cx="120" cy="42" r="17" fill="#8be0a4" stroke="none"/>
+<path d="M20 80V50M120 80V50" stroke="#f48fb1" stroke-width="5"/>
+<circle class="g" cx="20" cy="42" r="17" fill="#ffd1e0" stroke="none"/><circle class="g" cx="120" cy="42" r="17" fill="#ffd1e0" stroke="none"/>
 <circle cx="20" cy="42" r="9" fill="#fdf6ec"/><circle cx="120" cy="42" r="9" fill="#fdf6ec"/>
 <!-- sign -->
-<circle cx="70" cy="58" r="14" fill="#2f7d5b"/><path d="M64 65V51l6 9 6-9v14" stroke="#fdf6ec" stroke-width="3"/>
-<path d="M20 50h100" stroke="#2f7d5b" stroke-width="4"/>
+<circle cx="70" cy="58" r="14" fill="#f48fb1"/><path d="M77 52.5A9 9 0 1 0 77 63.5" stroke="#fdf6ec" stroke-width="4.5"/>
+<path d="M20 50h100" stroke="#f48fb1" stroke-width="4"/>
 </svg>

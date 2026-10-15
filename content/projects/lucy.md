@@ -2,7 +2,8 @@
 title: Lucy
 category: games
 alsoIn: [engineering, design]
-date: "2025"
+date: "2022-08"
+dateLabel: "Aug - Dec 2022"
 summary: A Unity game with AI enemies, handcrafted levels, and interactive props.
 tags: [Unity, C#, Perforce, AI]
 featured: true

@@ -96,6 +96,7 @@ function page(): string {
         <div class="hero-actions reveal">
           <a class="btn-big" href="#/explore">🗽 Explore my NYC</a>
           ${siteInfo.links.map((l) => `<a class="btn-ghost" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('')}
+          ${siteInfo.email ? `<a class="btn-ghost" href="mailto:${esc(siteInfo.email)}">✉️ Email me</a>` : ''}
           ${(siteInfo.resumes ?? []).map((l) => `<a class="btn-ghost" href="${esc(l.url.startsWith('http') ? l.url : asset(l.url))}" target="_blank" rel="noopener">📄 ${esc(l.label)}</a>`).join('')}
         </div>
       </div>
@@ -127,6 +128,18 @@ function page(): string {
     <section class="block" id="career-projects">
       <h2 class="reveal">Work by category</h2>
       <div id="proj-body">${projectsBody()}</div>
+    </section>
+
+    <section class="block contact" id="career-contact">
+      <h2 class="reveal">Contact</h2>
+      <div class="contact-card reveal">
+        <p>Want to work together, talk games, or just say hi? I'd love to hear from you.</p>
+        <div class="hero-actions">
+          ${siteInfo.email ? `<a class="btn-big" href="mailto:${esc(siteInfo.email)}">✉️ ${esc(siteInfo.email)}</a>` : ''}
+          ${(siteInfo.resumes ?? []).map((l) => `<a class="btn-ghost" href="${esc(l.url.startsWith('http') ? l.url : asset(l.url))}" target="_blank" rel="noopener">📄 ${esc(l.label)}</a>`).join('')}
+          ${siteInfo.links.map((l) => `<a class="btn-ghost" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('')}
+        </div>
+      </div>
     </section>
 
     <footer class="foot big">

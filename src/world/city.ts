@@ -256,11 +256,13 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
           <ellipse cy="16" rx="22" ry="9" fill="#cdbf9f"/><rect x="-8" y="-4" width="16" height="20" fill="#b9c9bb"/><path d="M-12 -4l12-26 12 26z" fill="#8fc7ae"/><path d="M10 -22l8-14" stroke-width="4"/><circle cx="19" cy="-39" r="5" fill="#ffd36e"/></g>
         ${boat([40.757, -74.0155], 'b1', '#e8505b')}${boat([40.727, -73.9715], 'b2', '#f6c453')}${boat([40.665, -74.035], 'b3', '#4f9d8f')}
         ${bldgSvg}
+        <rect class="night-rect" x="-4000" y="-4000" width="12000" height="12000" fill="#3c4a8c" opacity="0" style="mix-blend-mode:multiply;pointer-events:none"/>
         ${pinSvg}
         ${beaconSvg}
       </g>
     </svg>
     <div class="city-hint"></div>
+    <a class="city-skip" href="#/career">⏭ Skip to career page</a>
     <div class="city-zoom"><button data-zoom="in" aria-label="Zoom in">+</button><button data-zoom="out" aria-label="Zoom out">−</button><button data-zoom="fit" aria-label="Show the whole city" class="fit">⤢</button></div>`;
 
   const svg = wrap.querySelector<SVGSVGElement>('.city-svg')!;

@@ -3,7 +3,7 @@ import { neighborhoodFor, type Category } from '../neighborhoods';
 import { asset, esc } from '../util';
 
 export interface SceneCallbacks {
-  /** walk into the subway to go back to the city map */
+  /** take the C train back to the city map */
   exit: () => void;
   open: (entry: Project) => void;
   sign: (info: SignInfo) => void;
@@ -14,6 +14,7 @@ const BW = 560, BH = 420; // block size
 const AW = 170, SH = 150; // avenue (vertical road) width, street (horizontal road) height
 const BUILD_W = 230;
 const M = 300; // backdrop margin around the streets, so the screen never shows empty space
+const PINK = '#f48fb1'; // the C train, in baby pink
 
 /** viewBox heights of the 3D building sprites (all are 282 wide) */
 const SPRITE_H: Record<string, number> = {
@@ -29,8 +30,12 @@ const PROPS: Record<string, { vbw: number; vbh: number; w: number }> = {
 
 interface Landmark {
   title: string; sub: string; icon: string; color: string;
-  x: number; y: number; node: HTMLElement;
-  entry?: Project; sign?: SignInfo; exit?: boolean; action?: string;
+  /** where the player stands to use it, and how close they need to be */
+  x: number; y: number; r: number;
+  /** clickable area in world coordinates [x0, y0, x1, y1] */
+  rect: [number, number, number, number];
+  node: HTMLElement;
+  entry?: Project; sign?: SignInfo; exit?: boolean; action?: string; say?: string;
 }
 
 let playerSvg: Promise<string> | null = null;
@@ -57,6 +62,8 @@ function actionLabel(a?: string): string {
   return '';
 }
 
+const PIGEON = `<svg viewBox="0 0 38 28" fill="none" stroke="#3b2f3a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="16" cy="16" rx="12" ry="7.5" fill="#9aa0b4"/><path d="M5 14q9-9 16 0" fill="#7d849c"/><circle cx="27" cy="10" r="5.5" fill="#7d849c"/><path d="M32 10l5 1.5-5 2" fill="#f6a35c"/><circle cx="28" cy="9" r="1.2" fill="#3b2f3a" stroke="none"/><path d="M13 23v4M19 23v4M10 27h5M16 27h5"/></svg>`;
+
 export function createScene(root: HTMLElement, category: Category, cb: SceneCallbacks): SceneHandle {
   const nb = neighborhoodFor(category);
   const entries = worldEntries(category);
@@ -72,7 +79,13 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
   const world = document.createElement('div');
   world.className = 'scene-world';
   world.style.cssText = `width:${W}px;height:${H}px;`;
-  stage.appendChild(world);
+  // night tint sits above the world; lights and labels sit above the tint so they stay bright
+  const tint = document.createElement('div');
+  tint.className = 'night-tint';
+  const lights = document.createElement('div');
+  lights.className = 'scene-world scene-lights';
+  lights.style.cssText = `width:${W}px;height:${H}px;`;
+  stage.append(world, tint, lights);
   const prompt = document.createElement('div');
   prompt.className = 'scene-prompt';
   prompt.style.display = 'none';
@@ -87,6 +100,13 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     Object.assign(d.style, css);
     parent.appendChild(d);
     return d;
+  };
+  const glowAt = (x: number, y: number, rad: number) =>
+    el('night-only lglow', { left: px(x - rad), top: px(y - rad), width: px(rad * 2), height: px(rad * 2) }, lights);
+  const label = (x: number, y: number, text: string, color: string) => {
+    const t = el('tag', { left: px(x), top: px(y) }, lights);
+    t.style.setProperty('--c', color);
+    t.textContent = text;
   };
 
   /* ---------- ground ---------- */
@@ -130,7 +150,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     if (css) img.style.filter = css;
     d.appendChild(img);
     if (block) blockers.push(block);
-    return { d, top: bottom - h, h, bottom };
+    return { d, left, top: bottom - h, w, h, bottom };
   }
   const tree = (l: number, b: number, w = 96, solid = true) =>
     ent('art/props/tree.svg', 110, 140, l, b, w, solid ? [l + w * 0.4, b - 16, l + w * 0.6, b] : undefined);
@@ -139,23 +159,25 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     const { x: bx, y: by } = blockPos(idx);
     const bottom = by + BH - 70;
     let node: HTMLElement, tagTop: number, tagLeft: number, lx: number;
+    let rect: [number, number, number, number];
 
     if (entry.prop && PROPS[entry.prop]) {
       const p = PROPS[entry.prop];
       const left = bx + (BW - p.w) / 2;
       const e = ent(`art/props/${entry.prop}.svg`, p.vbw, p.vbh, left, bottom, p.w, [left + 14, bottom - 36, left + p.w - 14, bottom - 4]);
       node = e.d; tagTop = e.top - 12; tagLeft = left + p.w * 0.5; lx = left + p.w * 0.5;
+      rect = [left, e.top, left + p.w, bottom];
     } else {
       const sprite = entry.building && SPRITE_H[entry.building] ? entry.building : nb.building;
       const left = bx + (BW - BUILD_W) / 2;
       const hue = !entry.building && idx > 0 ? ((idx * 41) % 60) - 30 : 0;
       const e = ent(`art-v3/buildings/${sprite}.svg`, 282, SPRITE_H[sprite] ?? nb.buildingH, left, bottom, BUILD_W, [left + 6, bottom - 58, left + BUILD_W - 6, bottom - 4], hue ? `hue-rotate(${hue}deg)` : '');
       node = e.d; tagTop = e.top - 16; tagLeft = left + BUILD_W * 0.45; lx = left + BUILD_W * 0.43;
+      rect = [left, e.top, left + BUILD_W, bottom];
     }
-    const tag = el('tag', { left: px(tagLeft), top: px(tagTop) });
-    tag.style.setProperty('--c', nb.color);
-    tag.textContent = entry.title;
-    landmarks.push({ title: entry.title, sub: nb.label, icon: nb.icon, color: nb.color, x: lx, y: bottom + 12, node, entry, action: entry.action });
+    label(tagLeft, tagTop, entry.title, nb.color);
+    glowAt(lx, bottom - 90, 190);
+    landmarks.push({ title: entry.title, sub: nb.label, icon: nb.icon, color: nb.color, x: lx, y: bottom + 12, r: 125, rect, node, entry, action: entry.action });
 
     // greenery and street furniture around each lot
     const seed = (idx * 53 + 17) % 100;
@@ -172,29 +194,44 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     [[80, 210], [250, 190], [420, 240], [140, 340], [340, 360]].forEach(([dx, dy]) => tree(bx + dx, by + dy, 96));
   }
 
-  // corner lamps
+  // corner lamps (they light up at night)
   for (let rr = 0; rr < rows; rr++) for (let c = 0; c < cols; c++) {
     const bx = AVE[c] + AW, by = ST[rr] + SH;
-    [[bx + 8, by + BH - 6], [bx + BW - 40, by + BH - 6]].forEach(([l, b]) =>
-      ent('art/props/streetlamp.svg', 60, 150, l, b, 34, [l + 12, b - 10, l + 22, b]));
+    [[bx + 8, by + BH - 6], [bx + BW - 40, by + BH - 6]].forEach(([l, b]) => {
+      ent('art/props/streetlamp.svg', 60, 150, l, b, 34, [l + 12, b - 10, l + 22, b]);
+      glowAt(l + 17, b - 70, 95);
+    });
   }
 
-  // subway entrance (your way back to the NYC map) and the neighborhood sign, by the spawn point
+  // the C train entrance (your way back to the NYC map) and the neighborhood sign, by the spawn point
   const sw = blockPos((rows - 1) * cols);
   const subway = ent('art/props/subway-entrance.svg', 140, 150, sw.x + 60, sw.y + BH + 2, 112, [sw.x + 70, sw.y + BH - 24, sw.x + 162, sw.y + BH + 2]);
-  landmarks.push({ title: 'NYC map', sub: 'Take the subway back', icon: '🚇', color: '#2f7d5b', x: sw.x + 116, y: sw.y + BH + 18, node: subway.d, exit: true });
-  const sTag = el('tag', { left: px(sw.x + 116), top: px(subway.top - 12) });
-  sTag.style.setProperty('--c', '#2f7d5b');
-  sTag.textContent = '🚇 NYC map';
+  landmarks.push({
+    title: 'C train', sub: 'Back to the NYC map', icon: '🚇', color: PINK, x: sw.x + 116, y: sw.y + BH + 18, r: 85,
+    rect: [sw.x + 60, subway.top, sw.x + 172, sw.y + BH + 2], node: subway.d, exit: true,
+  });
+  label(sw.x + 116, subway.top - 12, '🚇 C train', PINK);
+  glowAt(sw.x + 116, subway.top + 40, 120);
 
   const signInfo = signFor(category);
   if (signInfo) {
     const sx = sw.x + 215;
     const sign = ent('art/props/sign.svg', 110, 150, sx, sw.y + BH + 4, 80, [sx + 24, sw.y + BH - 12, sx + 56, sw.y + BH + 4]);
-    landmarks.push({ title: 'Neighborhood guide', sub: nb.name, icon: 'ℹ️', color: nb.color, x: sx + 40, y: sw.y + BH + 20, node: sign.d, sign: signInfo });
-    const t = el('tag', { left: px(sx + 40), top: px(sign.top - 6) });
-    t.style.setProperty('--c', nb.color);
-    t.textContent = `ℹ️ ${nb.name} guide`;
+    landmarks.push({
+      title: 'Neighborhood guide', sub: nb.name, icon: 'ℹ️', color: nb.color, x: sx + 40, y: sw.y + BH + 20, r: 110,
+      rect: [sx, sign.top, sx + 80, sw.y + BH + 4], node: sign.d, sign: signInfo,
+    });
+    label(sx + 40, sign.top - 6, `ℹ️ ${nb.name} guide`, nb.color);
+  }
+
+  // hot dog cart on the first block's north sidewalk
+  {
+    const { x: bx, y: by } = blockPos(0);
+    const cart = ent('art/props/hotdog-cart.svg', 120, 110, bx + 50, by + 96, 92, [bx + 56, by + 78, bx + 136, by + 96]);
+    landmarks.push({
+      title: 'Hot dog cart', sub: 'Street food', icon: '🌭', color: '#e8505b', x: bx + 96, y: by + 112, r: 110,
+      rect: [bx + 50, cart.top, bx + 142, by + 96], node: cart.d, action: 'snack:🌭', say: '🌭 One with everything, please!',
+    });
   }
 
   /* ---------- backdrop: skyline, hedges, and trees so no screen edge is ever empty ---------- */
@@ -207,12 +244,10 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
   };
   for (let x = -M; x < W + M; x += 195) backBuilding(x + r() * 20, -8, 190);
   for (let x = -M + 90; x < W + M; x += 215) backBuilding(x + r() * 20, -150, 170);
-  // bottom: tree line
   for (let x = -M; x < W + M; x += 125) {
     tree(x + r() * 30, H + 150 + r() * 20, 100);
     if (r() > 0.45) tree(x + 60 + r() * 20, H + 250 + r() * 20, 96);
   }
-  // sides: skyline and trees
   for (let y = 60; y < H + 120; y += 190) {
     backBuilding(-M + 20 + r() * 20, y + 200, 170);
     backBuilding(W + 20 + r() * 40, y + 200, 170);
@@ -241,6 +276,31 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     c.d.style.zIndex = zOf(c.y);
   };
 
+  /* ---------- street life: pedestrians and pigeons ---------- */
+  interface Walker { d: HTMLElement; x: number; y: number; x0: number; x1: number; dir: 1 | -1; speed: number }
+  const walkers: Walker[] = [];
+  const blockCount = rows * cols;
+  const spawnBlock = (rows - 1) * cols;
+  for (let i = 0; i < Math.min(5, Math.max(2, blockCount + 1)); i++) {
+    const idx = i % blockCount;
+    const { x: bx, y: by } = blockPos(idx);
+    // keep clear of the spawn point and the subway
+    const x0 = bx + (idx === spawnBlock ? 300 : 40), x1 = bx + BW - 40;
+    const d = el('ent walker', { width: '50px', height: '78px', filter: `hue-rotate(${Math.floor(r() * 300)}deg) saturate(${0.9 + r() * 0.5})` });
+    void loadPlayer().then((t) => { if (alive) { d.innerHTML = t; (d.firstElementChild as SVGElement | null)?.classList.add('moving'); } });
+    walkers.push({ d, x: x0 + r() * (x1 - x0), y: by + BH - 12 + (i % 2) * 4, x0, x1, dir: r() > 0.5 ? 1 : -1, speed: 38 + r() * 30 });
+  }
+  interface Pigeon { d: HTMLElement; x: number; y: number }
+  const pigeons: Pigeon[] = [];
+  for (let i = 0; i < 4; i++) {
+    const { x: bx, y: by } = blockPos(Math.floor(r() * blockCount));
+    const d = el('ent pigeon', { width: '30px', height: '22px', transition: 'left .8s ease-out, top .8s ease-out' });
+    d.innerHTML = PIGEON;
+    const p = { d, x: bx + 60 + r() * (BW - 120), y: by + BH - 26 + r() * 10 };
+    d.style.left = px(p.x); d.style.top = px(p.y - 22); d.style.zIndex = zOf(p.y);
+    pigeons.push(p);
+  }
+
   /* ---------- player ---------- */
   const player = { x: sw.x + 116, y: ST[rows] + SH / 2 + 10, speed: 230, dir: 'front', moving: false, target: null as { x: number; y: number } | null };
   const pEl = el('ent player', { width: '56px', height: '87px' });
@@ -248,12 +308,16 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
 
   const keys = new Set<string>();
   const dirKey: Record<string, string> = { arrowleft: 'a', arrowright: 'd', arrowup: 'w', arrowdown: 's' };
+  const openDialog = () => document.querySelector<HTMLDialogElement>('dialog[open]');
+  let pending: Landmark | null = null;
   const onKeyDown = (e: KeyboardEvent) => {
-    if (document.querySelector('dialog[open]')) return;
     const k = dirKey[e.key.toLowerCase()] ?? e.key.toLowerCase();
-    if (k === 'e' || k === 'enter') interact();
-    else if (k === 'f') doAction();
-    else if (k.length === 1 && 'wasd'.includes(k)) { keys.add(k); e.preventDefault(); }
+    const dlg = openDialog();
+    // E closes an open card (Escape does too, natively)
+    if (dlg) { if (k === 'e' && !e.repeat) dlg.close(); return; }
+    if (k === 'e') { if (!e.repeat) interact(); }
+    else if (k === 'f') { if (!e.repeat) doAction(); }
+    else if (k.length === 1 && 'wasd'.includes(k)) { keys.add(k); pending = null; e.preventDefault(); }
   };
   const onKeyUp = (e: KeyboardEvent) => keys.delete(dirKey[e.key.toLowerCase()] ?? e.key.toLowerCase());
   window.addEventListener('keydown', onKeyDown);
@@ -278,17 +342,10 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     const ew = W + 2 * M, eh = H + 2 * M;
     camX = vw >= ew ? -M - (vw - ew) / 2 : Math.max(-M, Math.min(W + M - vw, player.x - vw / 2));
     camY = vh >= eh ? -M - (vh - eh) / 2 : Math.max(-M, Math.min(H + M - vh, player.y - vh / 2));
-    world.style.transform = `scale(${scale}) translate(${-camX}px, ${-camY}px)`;
+    const tf = `scale(${scale}) translate(${-camX}px, ${-camY}px)`;
+    world.style.transform = tf;
+    lights.style.transform = tf;
   }
-
-  /* ---------- tap to move ---------- */
-  stage.addEventListener('pointerdown', (e) => {
-    if ((e.target as HTMLElement).closest('.scene-prompt')) return;
-    const wx = e.clientX / scale + camX, wy = e.clientY / scale + camY;
-    player.target = { x: wx, y: wy };
-    const rip = el('ripple', { left: px(wx), top: px(wy) });
-    setTimeout(() => rip.remove(), 650);
-  });
 
   /* ---------- interaction ---------- */
   let nearest: Landmark | null = null;
@@ -301,15 +358,17 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => { toastEl.style.display = 'none'; }, 2600);
   }
-  function interact() {
-    if (!nearest) return;
-    if (nearest.exit) cb.exit();
-    else if (nearest.sign) cb.sign(nearest.sign);
-    else if (nearest.entry) cb.open(nearest.entry);
+  /** Open the card, read the sign, take the train, or chat with the cart. */
+  function activate(l: Landmark) {
+    if (l.exit) cb.exit();
+    else if (l.sign) cb.sign(l.sign);
+    else if (l.entry) cb.open(l.entry);
+    else if (l.say) say(l.say);
   }
+  function interact() { if (nearest) activate(nearest); }
   function pop(emoji: string, x: number, y: number, n = 7) {
     for (let i = 0; i < n; i++) {
-      const p = el('pop', { left: px(x + (Math.random() - 0.5) * 120), top: px(y), animationDelay: `${i * 70}ms`, zIndex: '99999' });
+      const p = el('pop', { left: px(x + (Math.random() - 0.5) * 120), top: px(y), animationDelay: `${i * 70}ms`, zIndex: '99999' }, lights);
       p.textContent = emoji;
       setTimeout(() => p.remove(), 1500 + i * 70);
     }
@@ -337,9 +396,25 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     } else if (a.startsWith('snack:')) {
       const emoji = a.slice(6);
       pop(emoji, l.x, l.y - 80);
-      say(`${emoji} Yum!`);
+      say(l.say ?? `${emoji} Yum!`);
     }
   }
+
+  /** Tap a building to walk up to it and open it; tap anywhere else to walk there. */
+  stage.addEventListener('pointerdown', (e) => {
+    if ((e.target as HTMLElement).closest('.scene-prompt')) return;
+    const wx = e.clientX / scale + camX, wy = e.clientY / scale + camY;
+    const tapped = landmarks.find((l) => wx >= l.rect[0] && wx <= l.rect[2] && wy >= l.rect[1] && wy <= l.rect[3]);
+    const rip = el('ripple', { left: px(wx), top: px(wy) });
+    setTimeout(() => rip.remove(), 650);
+    if (tapped) {
+      if (Math.hypot(tapped.x - player.x, tapped.y - player.y) < tapped.r) { player.target = null; pending = null; activate(tapped); }
+      else { pending = tapped; player.target = { x: tapped.x, y: tapped.y }; }
+      return;
+    }
+    pending = null;
+    player.target = { x: wx, y: wy };
+  });
   prompt.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     if ((e.target as HTMLElement).closest('.act')) doAction(); else interact();
@@ -375,6 +450,11 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     const svg = pEl.firstElementChild as SVGElement | null;
     if (svg) { svg.dataset.dir = player.dir; svg.classList.toggle('moving', player.moving); }
 
+    // a tapped building opens as soon as the player arrives
+    if (pending && Math.hypot(pending.x - player.x, pending.y - player.y) < Math.min(pending.r * 0.8, 70)) {
+      const l = pending; pending = null; player.target = null; activate(l);
+    }
+
     cars.forEach((c) => {
       const s = c.speed * dt;
       if (c.kind === 'E') c.x = c.x + s > W + 120 ? -120 : c.x + s;
@@ -384,11 +464,29 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
       placeCar(c);
     });
 
-    let best = 125;
+    walkers.forEach((w) => {
+      w.x += w.dir * w.speed * dt;
+      if (w.x > w.x1) { w.x = w.x1; w.dir = -1; } else if (w.x < w.x0) { w.x = w.x0; w.dir = 1; }
+      w.d.style.left = px(w.x - 25); w.d.style.top = px(w.y - 70); w.d.style.zIndex = zOf(w.y);
+      const s = w.d.firstElementChild as SVGElement | null;
+      if (s) s.dataset.dir = w.dir > 0 ? 'right' : 'left';
+    });
+    pigeons.forEach((p) => {
+      if (Math.hypot(p.x - player.x, p.y - player.y) < 85) {
+        const ang = Math.atan2(p.y - player.y, p.x - player.x) + (Math.random() - 0.5);
+        p.x = Math.max(0, Math.min(W, p.x + Math.cos(ang) * 220));
+        p.y = Math.max(0, Math.min(H, p.y + Math.sin(ang) * 120));
+        p.d.classList.add('fly');
+        p.d.style.left = px(p.x); p.d.style.top = px(p.y - 22); p.d.style.zIndex = zOf(p.y);
+        setTimeout(() => p.d.classList.remove('fly'), 850);
+      }
+    });
+
+    let best = Infinity;
     nearest = null;
     landmarks.forEach((l) => {
       const d = Math.hypot(l.x - player.x, l.y - player.y);
-      if (d < best) { best = d; nearest = l; }
+      if (d < l.r && d < best) { best = d; nearest = l; }
       l.node.classList.remove('near');
     });
     const near = nearest as Landmark | null;
@@ -397,7 +495,8 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
       prompt.style.display = 'flex';
       prompt.style.setProperty('--c', near.color);
       const act = actionLabel(near.action);
-      prompt.innerHTML = `<span class="pt">${near.icon} <b>${esc(near.title)}</b> · ${esc(near.sub)} <span>(press E or tap)</span></span>${act ? `<button class="act">${esc(act)}</button>` : ''}`;
+      const verb = near.exit ? 'press E to leave' : 'press E or tap';
+      prompt.innerHTML = `<span class="pt">${near.icon} <b>${esc(near.title)}</b> · ${esc(near.sub)} <span>(${verb})</span></span>${act ? `<button class="act">${esc(act)}</button>` : ''}`;
     } else prompt.style.display = 'none';
 
     camera();

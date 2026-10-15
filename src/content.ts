@@ -55,6 +55,8 @@ export interface SiteInfo {
   stats: { value: number; suffix?: string; label: string }[];
   skills: { group: string; items: string[] }[];
   resumes?: ProjectLink[];
+  /** public contact email shown in the Contact section */
+  email?: string;
   education?: { school: string; degree: string; years: string; awards: string[] };
 }
 export const siteInfo = site as SiteInfo;

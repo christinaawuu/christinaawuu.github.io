@@ -1,20 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" id="player" viewBox="0 0 72 112" fill="none" stroke="#3b2f3a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" data-dir="front">
+<svg xmlns="http://www.w3.org/2000/svg" class="pl" viewBox="0 0 72 112" fill="none" stroke="#3b2f3a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" data-dir="front">
 <style>
-#player[data-dir=front] .back, #player[data-dir=front] .side,
-#player[data-dir=back] .front, #player[data-dir=back] .side,
-#player[data-dir=left] .front, #player[data-dir=left] .back,
-#player[data-dir=right] .front, #player[data-dir=right] .back { display: none }
-#player[data-dir=right] .side { transform: translateX(72px) scaleX(-1) }
-#player .body { animation: idle 1.6s ease-in-out infinite }
+.pl[data-dir=front] .back, .pl[data-dir=front] .side,
+.pl[data-dir=back] .front, .pl[data-dir=back] .side,
+.pl[data-dir=left] .front, .pl[data-dir=left] .back,
+.pl[data-dir=right] .front, .pl[data-dir=right] .back { display: none }
+.pl[data-dir=right] .side { transform: translateX(72px) scaleX(-1) }
+.pl .body { animation: idle 1.6s ease-in-out infinite }
 @keyframes idle { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.2px) } }
-#player.moving .body { animation: hop .34s ease-in-out infinite }
+.pl.moving .body { animation: hop .34s ease-in-out infinite }
 @keyframes hop { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
-#player.moving .legA { animation: stepA .34s ease-in-out infinite }
-#player.moving .legB { animation: stepB .34s ease-in-out infinite }
+.pl.moving .legA { animation: stepA .34s ease-in-out infinite }
+.pl.moving .legB { animation: stepB .34s ease-in-out infinite }
 @keyframes stepA { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
 @keyframes stepB { 0%,100% { transform: translateY(-4px) } 50% { transform: translateY(0) } }
-#player.moving .swingA { animation: swA .34s ease-in-out infinite; transform-origin: 36px 82px }
-#player.moving .swingB { animation: swB .34s ease-in-out infinite; transform-origin: 36px 82px }
+.pl.moving .swingA { animation: swA .34s ease-in-out infinite; transform-origin: 36px 82px }
+.pl.moving .swingB { animation: swB .34s ease-in-out infinite; transform-origin: 36px 82px }
 @keyframes swA { 0%,100% { transform: rotate(-14deg) } 50% { transform: rotate(14deg) } }
 @keyframes swB { 0%,100% { transform: rotate(14deg) } 50% { transform: rotate(-14deg) } }
 </style>

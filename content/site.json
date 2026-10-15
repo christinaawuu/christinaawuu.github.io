@@ -81,7 +81,12 @@
       ]
     }
   ],
-  "resumes": [],
+  "resumes": [
+    {
+      "label": "Resume (SWE)",
+      "url": "resume/Christina_Wu_Resume_SWE.pdf"
+    }
+  ],
   "education": {
     "school": "University of Southern California",
     "degree": "B.S. in Computer Science (Games)",
@@ -92,5 +97,6 @@
       "Grace Hopper Celebration Scholarship",
       "Viterbi Fall Lead Scholarship"
     ]
-  }
+  },
+  "email": "christina.wu.dev@gmail.com"
 }
