@@ -458,11 +458,13 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   const ease = (x: number) => (1 - Math.cos(Math.PI * x)) / 2; // gentle in and out
   let anim = 0;
   // wheel and button zooms glide toward a target instead of jumping
+  let focus: P | null = null; // the screen point being zoomed on (cursor or pinch center)
   let tgt: { s: number; tx: number; ty: number } | null = null;
   let smoothRaf = 0;
   const stopSmooth = () => { cancelAnimationFrame(smoothRaf); smoothRaf = 0; tgt = null; };
   function zoomTarget(cx: number, cy: number, factor: number): void {
     cancelAnimationFrame(anim);
+    focus = { x: cx, y: cy };
     const base = tgt ?? { s, tx, ty };
     const ns = Math.min(maxZoom(), Math.max(fit, base.s * factor));
     let ntx = cx - ((cx - base.tx) * ns) / base.s, nty = cy - ((cy - base.ty) * ns) / base.s;
@@ -525,19 +527,26 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
     clearTimeout(settle);
     settle = window.setTimeout(() => {
       if (s < fit * 3.3) return;
-      let best: Beacon | null = null, bd = Math.min(vw, vh) * 0.22;
+      // zooming with the cursor on a light keeps that light under the cursor, so check there as well as the screen center
+      const spots = [{ x: vw / 2, y: vh / 2, r: Math.min(vw, vh) * 0.22 }];
+      if (focus) spots.unshift({ x: focus.x, y: focus.y, r: 130 });
+      let best: Beacon | null = null, bd = Infinity;
       for (const b of beacons) {
         if (!b.live) continue;
-        const d = Math.hypot(b.x * s + tx - vw / 2, b.y * s + ty - vh / 2);
-        if (d < bd) { bd = d; best = b; }
+        for (const sp of spots) {
+          const d = Math.hypot(b.x * s + tx - sp.x, b.y * s + ty - sp.y);
+          if (d < sp.r && d < bd) { bd = d; best = b; }
+        }
       }
       if (best) void flyInto(best.category);
-    }, 550);
+    }, 450);
   }
+
 
   svg.addEventListener('pointerdown', (e) => {
     cancelAnimationFrame(anim);
     stopSmooth();
+    focus = null;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.size === 1) drag = { sx: e.clientX, sy: e.clientY, tx, ty, moved: false, target: e.target as Element };
     else {
@@ -553,6 +562,7 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
       const [a, b] = [...pointers.values()];
       const dist = Math.hypot(a.x - b.x, a.y - b.y), mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
       zoomAt(mid.x, mid.y, dist / pinch.dist);
+      focus = mid;
       tx += mid.x - pinch.mid.x; ty += mid.y - pinch.mid.y; clampPan(); apply();
       pinch = { dist, mid };
     } else if (drag) {
