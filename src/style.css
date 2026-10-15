@@ -196,3 +196,6 @@ body.night .cloud { opacity: .35; }
 .city-label-text.tiny { font-size: 10.5px; }
 .zoomed-far { display: none; }
 .city.zoomed-far .zoomed-far { display: inline; }
+
+.torch { animation: torch 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
+@keyframes torch { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12, 1.18); } }

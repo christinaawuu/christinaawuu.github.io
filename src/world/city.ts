@@ -114,70 +114,132 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   const inPark = (x: number, y: number) => inside(cpFlat, x, y) || inside(ppFlat, x, y);
   const near = (x: number, y: number, r: number) => keepClear.some((k) => Math.hypot(k.x - x, k.y - y) < r);
 
+  // Several building shapes so the skyline has variety. Each is drawn in the same cartoon style and tinted with currentColor.
+  const OUT = 'stroke="#3b2f3a" stroke-width="1.4" stroke-linejoin="round"';
+  const win = (pts: [number, number][]) => `<g fill="#fff6c8" opacity=".9">${pts.map(([x, y]) => `<rect x="${x}" y="${y}" width="2.4" height="2.6"/>`).join('')}</g>`;
   const buildingSymbol = `
-    <symbol id="b" viewBox="0 0 20 30">
-      <rect x="2" y="9" width="12" height="19" rx="1.5" fill="currentColor" stroke="#3b2f3a" stroke-width="1.4"/>
-      <path d="M14 9l4-4v19l-4 4z" fill="currentColor" stroke="#3b2f3a" stroke-width="1.4"/><path d="M14 9l4-4v19l-4 4z" fill="#000" opacity=".22"/>
-      <path d="M2 9l4-4h12l-4 4z" fill="#fff" opacity=".45" stroke="#3b2f3a" stroke-width="1.4"/>
-      <g fill="#fff6c8" opacity=".9"><rect x="4" y="12" width="3" height="3"/><rect x="9" y="12" width="3" height="3"/><rect x="4" y="18" width="3" height="3"/><rect x="9" y="18" width="3" height="3"/></g>
+    <symbol id="b0" viewBox="0 0 20 30"><!-- plain box -->
+      <rect x="2" y="9" width="12" height="19" rx="1.5" fill="currentColor" ${OUT}/>
+      <path d="M14 9l4-4v19l-4 4z" fill="currentColor" ${OUT}/><path d="M14 9l4-4v19l-4 4z" fill="#000" opacity=".22"/>
+      <path d="M2 9l4-4h12l-4 4z" fill="#fff" opacity=".45" ${OUT}/>${win([[4, 12], [9, 12], [4, 18], [9, 18], [4, 23], [9, 23]])}
+    </symbol>
+    <symbol id="b1" viewBox="0 0 20 30"><!-- setback tower with an antenna -->
+      <rect x="2" y="17" width="12" height="11" rx="1.2" fill="currentColor" ${OUT}/>
+      <path d="M14 17l4-3v14l-4 3z" fill="currentColor" ${OUT}/><path d="M14 17l4-3v14l-4 3z" fill="#000" opacity=".22"/>
+      <rect x="4" y="7" width="8" height="10" rx="1" fill="currentColor" ${OUT}/>
+      <path d="M12 7l3-2.4v12.4l-3 2.4z" fill="currentColor" ${OUT}/><path d="M12 7l3-2.4v12.4l-3 2.4z" fill="#000" opacity=".22"/>
+      <path d="M4 7l3-2.4h8l-3 2.4z" fill="#fff" opacity=".45" ${OUT}/><path d="M9 4.6V0.8" ${OUT}/>${win([[5.5, 10], [8.5, 10], [4, 20], [9, 20], [4, 24.5], [9, 24.5]])}
+    </symbol>
+    <symbol id="b2" viewBox="0 0 20 30"><!-- slim tower with a spire -->
+      <rect x="5" y="9" width="7" height="19" rx="1" fill="currentColor" ${OUT}/>
+      <path d="M12 9l3-2.6v19.6l-3 2.6z" fill="currentColor" ${OUT}/><path d="M12 9l3-2.6v19.6l-3 2.6z" fill="#000" opacity=".22"/>
+      <path d="M5 9l3-2.6h7l-3 2.6z" fill="#fff" opacity=".45" ${OUT}/><path d="M11.5 6.4V0.6" ${OUT}/>${win([[6.2, 12], [6.2, 17], [6.2, 22]])}
+    </symbol>
+    <symbol id="b3" viewBox="0 0 30 24"><!-- wide low block -->
+      <rect x="1" y="9" width="22" height="13" rx="1.4" fill="currentColor" ${OUT}/>
+      <path d="M23 9l5-3.5v13l-5 3.5z" fill="currentColor" ${OUT}/><path d="M23 9l5-3.5v13l-5 3.5z" fill="#000" opacity=".22"/>
+      <path d="M1 9l5-3.5h22l-5 3.5z" fill="#fff" opacity=".45" ${OUT}/>${win([[4, 12], [9, 12], [14, 12], [19, 12], [4, 17], [9, 17], [14, 17], [19, 17]])}
+    </symbol>
+    <symbol id="b4" viewBox="0 0 20 30"><!-- gabled house -->
+      <rect x="3" y="17" width="10" height="11" rx="1" fill="currentColor" ${OUT}/>
+      <path d="M13 17l4-3v11l-4 3z" fill="currentColor" ${OUT}/><path d="M13 17l4-3v11l-4 3z" fill="#000" opacity=".22"/>
+      <path d="M2 17L8 9.5L14 17z" fill="currentColor" ${OUT}/><path d="M2 17L8 9.5L14 17z" fill="#000" opacity=".3"/>
+      <path d="M8 9.5L12 7L18 14L14 17z" fill="currentColor" ${OUT}/><path d="M8 9.5L12 7L18 14L14 17z" fill="#000" opacity=".4"/>${win([[4.5, 20], [8.5, 20], [4.5, 24.5]])}
+    </symbol>
+    <symbol id="b5" viewBox="0 0 20 30"><!-- slab with a sloped glass top -->
+      <path d="M3 28V12L13 6V28z" fill="currentColor" ${OUT}/>
+      <path d="M13 6l3.4-2.6v22.6l-3.4 2.6z" fill="currentColor" ${OUT}/><path d="M13 6l3.4-2.6v22.6l-3.4 2.6z" fill="#000" opacity=".22"/>
+      <path d="M3 12L13 6l3.4-2.6L6.4 9.4z" fill="#fff" opacity=".5" ${OUT}/>${win([[5, 14], [9, 12], [5, 19], [9, 19], [5, 24], [9, 24]])}
     </symbol>`;
+  // [symbol id, width / height]
+  const SHAPES: Record<string, number> = { b0: 0.667, b1: 0.667, b2: 0.667, b3: 1.25, b4: 0.667, b5: 0.667 };
+  const pickShape = (zone: 'tall' | 'mid' | 'outer', k: number): string => {
+    const t = k * 100 % 1; // second independent-looking value from the same hash
+    const r = t;
+    if (zone === 'tall') return r < 0.34 ? 'b1' : r < 0.58 ? 'b2' : r < 0.82 ? 'b5' : 'b0';
+    if (zone === 'mid') return r < 0.42 ? 'b0' : r < 0.68 ? 'b3' : r < 0.84 ? 'b1' : r < 0.93 ? 'b5' : 'b4';
+    return r < 0.4 ? 'b4' : r < 0.72 ? 'b3' : 'b0';
+  };
 
-  const bldgs: { x: number; y: number; w: number; h: number; c: string }[] = [];
+  const bldgs: { x: number; y: number; w: number; h: number; c: string; t: string }[] = [];
   // deterministic "randomness" tied to a position, so the skyline is identical every visit
   const hh = (a: number, b: number) => { const t = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return t - Math.floor(t); };
   const gauss = (d: number, w: number) => Math.exp(-(d * d) / (2 * w * w));
   const manhattan = BOROUGH_RINGS.Manhattan;
   const cx = FOCUS.x + FOCUS.w / 2, cy = FOCUS.y + FOCUS.h / 2;
   const latOf = (y: number) => GEO.lat0 - y / GEO.k;
-  /** Skyline profile: tall in the Financial District and Midtown, low and steady everywhere else. */
-  const heightAt = (lat: number) => 24 + 48 * gauss(lat - 40.7075, 0.0048) + 52 * gauss(lat - 40.7555, 0.0105);
-  const paletteFor = (h: number, k: number) => (h > 40 ? TALL_COLORS : LOW_COLORS)[Math.floor(k * 100) % (h > 40 ? TALL_COLORS.length : LOW_COLORS.length)];
-  // Manhattan: two tidy columns of buildings per avenue block, one row per street block, all on the real street grid
-  for (let u = -1500; u <= 1700; u += 30) {
+  /** Skyline profile: tall in the Financial District and Midtown, lower everywhere else. */
+  const heightAt = (lat: number) => 22 + 50 * gauss(lat - 40.7075, 0.0048) + 54 * gauss(lat - 40.7555, 0.0105);
+  const tallPal = (k: number) => TALL_COLORS[Math.floor(k * 100) % TALL_COLORS.length];
+  const lowPal = (k: number) => LOW_COLORS[Math.floor(k * 100) % LOW_COLORS.length];
+  const add = (x: number, y: number, h: number, zone: 'tall' | 'mid' | 'outer', k: number) => {
+    const t = pickShape(zone, hh(k, 3.7));
+    const hh2 = t === 'b3' ? h * 0.62 : t === 'b4' ? h * 0.8 : h; // wide blocks and houses stay low
+    const w = hh2 * SHAPES[t] * (0.9 + 0.25 * hh(k, 9.1));
+    bldgs.push({ x, y, w, h: hh2, c: zone === 'tall' || hh2 > 44 ? tallPal(hh(k, 5)) : lowPal(hh(k, 11)), t });
+  };
+
+  // Manhattan: dense, three columns per avenue block, one row per street block, on the real street grid
+  for (let u = -1500; u <= 1700; u += 22) {
     for (let j = 0; j < 14; j++) {
-      for (const side of [-15, 15]) {
+      for (const side of [-21, 0, 21]) {
         const v = -420 + 60 * j + 30 + side;
         const x = cx + AVE.x * u + STR.x * v, y = cy + AVE.y * u + STR.y * v;
-        const ex = STR.x * 13, ey = STR.y * 13; // keep both edges of the footprint on land
-        if (!inside(manhattan, x, y) || !inside(manhattan, x + ex, y + ey) || !inside(manhattan, x - ex, y - ey) || inPark(x, y) || near(x, y, 46)) continue;
+        const ex = STR.x * 10, ey = STR.y * 10; // keep both edges of the footprint on land
+        if (!inside(manhattan, x, y) || !inside(manhattan, x + ex, y + ey) || !inside(manhattan, x - ex, y - ey) || inPark(x, y) || near(x, y, 44)) continue;
         const k = hh(Math.round(x), Math.round(y));
-        const h = heightAt(latOf(y)) * (0.8 + 0.4 * k);
-        bldgs.push({ x, y, w: 22 + Math.min(6, h * 0.06), h, c: paletteFor(h, hh(k, 7)) });
+        if (k < 0.07) continue; // the odd empty lot
+        const base = heightAt(latOf(y));
+        // a wide spread of heights, with the occasional much taller tower
+        const h = base * (0.55 + 0.9 * hh(k, 1.3)) * (hh(k, 2.2) > 0.93 ? 1.6 : 1);
+        add(x, y, h, base > 46 ? 'tall' : 'mid', k);
       }
     }
   }
-  // Brooklyn, Queens and the Bronx: sparse, low, evenly spaced
-  for (const name of ['Brooklyn', 'Queens', 'Bronx']) {
-    const ring = BOROUGH_RINGS[name];
-    for (let gx = FOCUS.x - 700, i = 0; gx < FOCUS.x + FOCUS.w + 900; gx += 66, i++) {
-      for (let gy = FOCUS.y - 500, j = 0; gy < FOCUS.y + FOCUS.h + 700; gy += 66, j++) {
-        const k = hh(i * 3.1, j * 5.7);
-        if (k < 0.5) continue; // leave breathing room
-        const x = gx + (i % 2) * 22, y = gy;
-        if (!inside(ring, x, y) || inPark(x, y) || near(x, y, 58)) continue;
-        const h = 18 + 12 * hh(i, j * 2.3);
-        bldgs.push({ x, y, w: 20, h, c: LOW_COLORS[Math.floor(k * 100) % LOW_COLORS.length] });
+
+  // Everywhere else: small buildings that thin out the farther they are from Manhattan and Brooklyn
+  {
+    const core = xy([40.7, -73.99]);
+    const NJ_RING = NJ.flatMap((ll) => { const q = xy(ll); return [q.x, q.y]; });
+    const lands: { ring: number[]; bonus: number }[] = [
+      { ring: BOROUGH_RINGS.Brooklyn, bonus: 1.15 }, { ring: BOROUGH_RINGS.Queens, bonus: 0.9 }, { ring: BOROUGH_RINGS.Bronx, bonus: 0.85 },
+      { ring: BOROUGH_RINGS['Staten Island'], bonus: 0.7 }, { ring: NJ_RING, bonus: 0.8 },
+    ];
+    const STEP = 40;
+    for (let gx = -500, i = 0; gx < MAP_W + 120; gx += STEP, i++) {
+      for (let gy = -60, j = 0; gy < MAP_H; gy += STEP, j++) {
+        const x = gx + (hh(i, j) - 0.5) * 18, y = gy + (hh(j, i * 1.7) - 0.5) * 18;
+        for (const land of lands) {
+          if (!inside(land.ring, x, y)) continue;
+          if (inPark(x, y) || near(x, y, 46)) break;
+          const d = Math.hypot(x - core.x, y - core.y);
+          const p = Math.max(0.06, Math.min(0.7, 0.78 * Math.exp(-d / 720) * land.bonus));
+          const k = hh(Math.round(x), Math.round(y));
+          if (k > p) break;
+          add(x, y, 15 + 13 * hh(k, 4.4) + 12 * gauss(d, 260), 'outer', k);
+          break;
+        }
       }
     }
   }
-  // Downtown Brooklyn: a small cluster of high-rises, tallest in the middle
+
+  // Downtown Brooklyn: a cluster of high-rises, tallest in the middle
   {
     const dtb = xy([40.6925, -73.989]);
-    for (let dx = -108; dx <= 108; dx += 30) {
-      for (let dy = -90; dy <= 90; dy += 28) {
+    for (let dx = -112; dx <= 112; dx += 26) {
+      for (let dy = -92; dy <= 92; dy += 24) {
         const d = Math.hypot(dx, dy);
-        if (d > 112) continue;
-        const x = dtb.x + dx, y = dtb.y + dy;
-        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 58)) continue;
+        if (d > 116) continue;
+        const x = dtb.x + dx + (hh(dx, dy) - 0.5) * 8, y = dtb.y + dy + (hh(dy, dx) - 0.5) * 8;
+        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 46)) continue;
         const k = hh(x, y);
-        const h = (40 + 30 * gauss(d, 62)) * (0.85 + 0.3 * k);
-        bldgs.push({ x, y, w: 23, h, c: TALL_COLORS[Math.floor(k * 100) % TALL_COLORS.length] });
+        add(x, y, (36 + 34 * gauss(d, 64)) * (0.7 + 0.6 * k), 'tall', k);
       }
     }
   }
   bldgs.sort((a, b) => a.y - b.y);
   const bldgSvg = bldgs
-    .map((b) => `<use href="#b" x="${(b.x - b.w / 2).toFixed(0)}" y="${(b.y - b.h).toFixed(0)}" width="${b.w.toFixed(0)}" height="${b.h.toFixed(0)}" style="color:${b.c}"/>`)
+    .map((b) => `<use href="#${b.t}" x="${(b.x - b.w / 2).toFixed(0)}" y="${(b.y - b.h).toFixed(0)}" width="${b.w.toFixed(0)}" height="${b.h.toFixed(0)}" style="color:${b.c}"/>`)
     .join('');
 
   // street grid, clipped to Manhattan
@@ -207,7 +269,6 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
     const p = xy(ll);
     return `<text x="${p.x.toFixed(0)}" y="${p.y.toFixed(0)}" transform="rotate(${rot} ${p.x.toFixed(0)} ${p.y.toFixed(0)})" class="${cls}" text-anchor="middle">${text}</text>`;
   };
-  const statue = xy([40.6892, -74.0445]);
   const pond = xy([40.7855, -73.9625]);
   const boat = (ll: [number, number], cls: string, hat: string) => {
     const p = xy(ll);
@@ -326,7 +387,30 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
     return `<g transform="translate(${q.x.toFixed(0)} ${q.y.toFixed(0)})" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round"><g transform="scale(1.6)">${art}</g>
       <g class="lbl zoomed-only" data-off="14"><rect x="-80" y="-11" width="160" height="22" rx="11" fill="#fff" stroke="#3b2f3a" stroke-width="2"/><text y="4.5" text-anchor="middle" class="city-label-text small">${esc(name)}</text></g></g>`;
   };
+
+  const libertyArt = `<g transform="scale(.66)">
+      <ellipse cy="6" rx="46" ry="15" fill="#3b2f3a" opacity=".16" stroke="none"/>
+      <ellipse cy="2" rx="40" ry="13" fill="#d8cda8"/><ellipse cy="-1" rx="34" ry="10" fill="#a5cf9a"/>
+      <path d="M0 -12 L7 -7 L16 -9 L12 -2 L20 3 L10 4 L7 11 L0 5 L-7 11 L-10 4 L-20 3 L-12 -2 L-16 -9 L-7 -7z" fill="#cdbf9f" stroke-width="2.5"/>
+      <rect x="-16" y="-14" width="32" height="10" rx="2" fill="#d6d0dc"/>
+      <rect x="-12" y="-36" width="24" height="23" rx="2" fill="#cfc8d6"/>
+      <path d="M-12 -30h24M-12 -22h24" stroke-width="1.5" opacity=".35"/>
+      <rect x="-14" y="-40" width="28" height="6" rx="2" fill="#e3deea"/>
+      <path d="M-9 -40 L-6 -72 L7 -72 L10 -40z" fill="#7fc4a8"/>
+      <path d="M-4 -44 L-3 -68M2 -44 L2 -68M7 -44 L6 -68" stroke-width="1.6" opacity=".45"/>
+      <path d="M-5 -66 L-10 -86" stroke="#3b2f3a" stroke-width="9" stroke-linecap="round"/>
+      <path d="M-5 -66 L-10 -86" stroke="#7fc4a8" stroke-width="5" stroke-linecap="round"/>
+      <path d="M-10 -86 L-10 -94" stroke-width="3"/>
+      <path d="M-14 -94 h8 l-1 4 h-6z" fill="#7fc4a8" stroke-width="2"/>
+      <path class="torch" d="M-10 -96 C-16 -103 -11 -108 -10 -113 C-8 -108 -4 -103 -10 -96z" fill="#ffd36e" stroke-width="2.2"/>
+      <path d="M6 -62 L12 -56" stroke="#3b2f3a" stroke-width="8" stroke-linecap="round"/><path d="M6 -62 L12 -56" stroke="#7fc4a8" stroke-width="4" stroke-linecap="round"/>
+      <rect x="9" y="-66" width="9" height="13" rx="1.5" transform="rotate(14 13 -60)" fill="#8fd0b4" stroke-width="2.2"/>
+      <circle cx="-1" cy="-77" r="5.6" fill="#7fc4a8"/>
+      <path d="M-6 -81 L-12 -88M-4 -82.5 L-8 -91M-1.5 -83 L-2 -92M1.5 -83 L4 -91M4 -81.5 L10 -88M6 -79 L13 -84" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M-6 -81 L-12 -88M-4 -82.5 L-8 -91M-1.5 -83 L-2 -92M1.5 -83 L4 -91M4 -81.5 L10 -88M6 -79 L13 -84" stroke="#9ad6bd" stroke-width="1" stroke-linecap="round"/>
+    </g>`;
   const landmarkIcons = [
+    icon([40.6892, -74.0445], 'Statue of Liberty', libertyArt),
     icon([40.7484, -73.9857], 'Empire State Building', '<ellipse cy="2" rx="18" ry="6" fill="#3b2f3a" opacity=".2" stroke="none"/><rect x="-14" y="-40" width="28" height="40" fill="#cfc8d6"/><rect x="-10" y="-62" width="20" height="22" fill="#bfb8c9"/><rect x="-6" y="-78" width="12" height="16" fill="#cfc8d6"/><path d="M0 -78V-102" stroke-width="3"/>'),
     icon([40.7516, -73.9755], 'Chrysler Building', '<ellipse cy="2" rx="16" ry="5" fill="#3b2f3a" opacity=".2" stroke="none"/><rect x="-11" y="-46" width="22" height="46" fill="#d9d3c4"/><path d="M-11 -46Q0 -84 11 -46z" fill="#e6e1d6"/><path d="M-7 -52Q0 -70 7 -52M-4 -62Q0 -74 4 -62" fill="none" stroke-width="2"/><path d="M0 -78V-94" stroke-width="3"/>'),
     icon([40.7127, -74.0134], 'One World Trade Center', '<ellipse cy="2" rx="16" ry="5" fill="#3b2f3a" opacity=".2" stroke="none"/><path d="M-12 0L-8 -66L0 -74L8 -66L12 0z" fill="#cfe0ee"/><path d="M0 -74V-112" stroke-width="3"/>'),
@@ -369,8 +453,6 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
         ${label([40.775, -74.03], 'HUDSON RIVER', -61)}${label([40.77, -73.935], 'EAST RIVER', -61)}${label([40.62, -74.03], 'UPPER BAY', 0)}
         ${label([40.67, -73.93], 'BROOKLYN', 0)}${label([40.755, -73.88], 'QUEENS', 0)}${label([40.83, -73.9], 'THE BRONX', 0)}${label([40.74, -74.065], 'NEW JERSEY', -61)}
         ${label([40.786, -73.966], 'CENTRAL PARK', -61, 'city-park-label')}${label([40.6445, -73.9695], 'PROSPECT PARK', 0, 'city-park-label')}
-        <g transform="translate(${statue.x.toFixed(0)} ${statue.y.toFixed(0)})" stroke="#3b2f3a" stroke-width="3" stroke-linejoin="round">
-          <ellipse cy="16" rx="22" ry="9" fill="#cdbf9f"/><rect x="-8" y="-4" width="16" height="20" fill="#b9c9bb"/><path d="M-12 -4l12-26 12 26z" fill="#8fc7ae"/><path d="M10 -22l8-14" stroke-width="4"/><circle cx="19" cy="-39" r="5" fill="#ffd36e"/></g>
         ${boat([40.757, -74.0155], 'b1', '#e8505b')}${boat([40.727, -73.9715], 'b2', '#f6c453')}${boat([40.665, -74.035], 'b3', '#4f9d8f')}
         ${bldgSvg}
         ${landmarkIcons}
