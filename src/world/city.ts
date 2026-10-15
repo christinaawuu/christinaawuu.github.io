@@ -18,6 +18,15 @@ const FOCUS_A = xy([40.806, -74.04]);
 const FOCUS_B = xy([40.652, -73.93]);
 const FOCUS = { x: FOCUS_A.x, y: FOCUS_A.y, w: FOCUS_B.x - FOCUS_A.x, h: FOCUS_B.y - FOCUS_A.y };
 
+function rng(seed: number): () => number {
+  return () => {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 /** Closed smooth path through points (Catmull-Rom converted to cubic Beziers). */
 function smooth(pts: P[]): string {
   const n = pts.length;
@@ -55,9 +64,7 @@ export interface CityHandle {
 
 interface Beacon extends P { category: Category; live: boolean }
 
-// Two quiet palettes: cool glass for the tall clusters, warm brick and sandstone for everything else.
-const TALL_COLORS = ['#9db6d8', '#b3a8de', '#8fb4cc', '#a7bde2'];
-const LOW_COLORS = ['#efb9a1', '#e8a79b', '#f2cf94', '#d9b4c6', '#eac39d'];
+const BUILDING_COLORS = ['#e8a598', '#f0c987', '#a8c9d8', '#b9d3a8', '#d6b8e0', '#f2d6b3', '#9fb4c8', '#e6b8c6', '#cfc8d6'];
 
 // New Jersey is not in the NYC data, so its shoreline is traced by hand (latitude, longitude).
 const NJ: [number, number][] = [
@@ -114,132 +121,58 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
   const inPark = (x: number, y: number) => inside(cpFlat, x, y) || inside(ppFlat, x, y);
   const near = (x: number, y: number, r: number) => keepClear.some((k) => Math.hypot(k.x - x, k.y - y) < r);
 
-  // Several building shapes so the skyline has variety. Each is drawn in the same cartoon style and tinted with currentColor.
-  const OUT = 'stroke="#3b2f3a" stroke-width="1.4" stroke-linejoin="round"';
-  const win = (pts: [number, number][]) => `<g fill="#fff6c8" opacity=".9">${pts.map(([x, y]) => `<rect x="${x}" y="${y}" width="2.4" height="2.6"/>`).join('')}</g>`;
   const buildingSymbol = `
-    <symbol id="b0" viewBox="0 0 20 30"><!-- plain box -->
-      <rect x="2" y="9" width="12" height="19" rx="1.5" fill="currentColor" ${OUT}/>
-      <path d="M14 9l4-4v19l-4 4z" fill="currentColor" ${OUT}/><path d="M14 9l4-4v19l-4 4z" fill="#000" opacity=".22"/>
-      <path d="M2 9l4-4h12l-4 4z" fill="#fff" opacity=".45" ${OUT}/>${win([[4, 12], [9, 12], [4, 18], [9, 18], [4, 23], [9, 23]])}
-    </symbol>
-    <symbol id="b1" viewBox="0 0 20 30"><!-- setback tower with an antenna -->
-      <rect x="2" y="17" width="12" height="11" rx="1.2" fill="currentColor" ${OUT}/>
-      <path d="M14 17l4-3v14l-4 3z" fill="currentColor" ${OUT}/><path d="M14 17l4-3v14l-4 3z" fill="#000" opacity=".22"/>
-      <rect x="4" y="7" width="8" height="10" rx="1" fill="currentColor" ${OUT}/>
-      <path d="M12 7l3-2.4v12.4l-3 2.4z" fill="currentColor" ${OUT}/><path d="M12 7l3-2.4v12.4l-3 2.4z" fill="#000" opacity=".22"/>
-      <path d="M4 7l3-2.4h8l-3 2.4z" fill="#fff" opacity=".45" ${OUT}/><path d="M9 4.6V0.8" ${OUT}/>${win([[5.5, 10], [8.5, 10], [4, 20], [9, 20], [4, 24.5], [9, 24.5]])}
-    </symbol>
-    <symbol id="b2" viewBox="0 0 20 30"><!-- slim tower with a spire -->
-      <rect x="5" y="9" width="7" height="19" rx="1" fill="currentColor" ${OUT}/>
-      <path d="M12 9l3-2.6v19.6l-3 2.6z" fill="currentColor" ${OUT}/><path d="M12 9l3-2.6v19.6l-3 2.6z" fill="#000" opacity=".22"/>
-      <path d="M5 9l3-2.6h7l-3 2.6z" fill="#fff" opacity=".45" ${OUT}/><path d="M11.5 6.4V0.6" ${OUT}/>${win([[6.2, 12], [6.2, 17], [6.2, 22]])}
-    </symbol>
-    <symbol id="b3" viewBox="0 0 30 24"><!-- wide low block -->
-      <rect x="1" y="9" width="22" height="13" rx="1.4" fill="currentColor" ${OUT}/>
-      <path d="M23 9l5-3.5v13l-5 3.5z" fill="currentColor" ${OUT}/><path d="M23 9l5-3.5v13l-5 3.5z" fill="#000" opacity=".22"/>
-      <path d="M1 9l5-3.5h22l-5 3.5z" fill="#fff" opacity=".45" ${OUT}/>${win([[4, 12], [9, 12], [14, 12], [19, 12], [4, 17], [9, 17], [14, 17], [19, 17]])}
-    </symbol>
-    <symbol id="b4" viewBox="0 0 20 30"><!-- gabled house -->
-      <rect x="3" y="17" width="10" height="11" rx="1" fill="currentColor" ${OUT}/>
-      <path d="M13 17l4-3v11l-4 3z" fill="currentColor" ${OUT}/><path d="M13 17l4-3v11l-4 3z" fill="#000" opacity=".22"/>
-      <path d="M2 17L8 9.5L14 17z" fill="currentColor" ${OUT}/><path d="M2 17L8 9.5L14 17z" fill="#000" opacity=".3"/>
-      <path d="M8 9.5L12 7L18 14L14 17z" fill="currentColor" ${OUT}/><path d="M8 9.5L12 7L18 14L14 17z" fill="#000" opacity=".4"/>${win([[4.5, 20], [8.5, 20], [4.5, 24.5]])}
-    </symbol>
-    <symbol id="b5" viewBox="0 0 20 30"><!-- slab with a sloped glass top -->
-      <path d="M3 28V12L13 6V28z" fill="currentColor" ${OUT}/>
-      <path d="M13 6l3.4-2.6v22.6l-3.4 2.6z" fill="currentColor" ${OUT}/><path d="M13 6l3.4-2.6v22.6l-3.4 2.6z" fill="#000" opacity=".22"/>
-      <path d="M3 12L13 6l3.4-2.6L6.4 9.4z" fill="#fff" opacity=".5" ${OUT}/>${win([[5, 14], [9, 12], [5, 19], [9, 19], [5, 24], [9, 24]])}
+    <symbol id="b" viewBox="0 0 20 30">
+      <rect x="2" y="9" width="12" height="19" rx="1.5" fill="currentColor" stroke="#3b2f3a" stroke-width="1.4"/>
+      <path d="M14 9l4-4v19l-4 4z" fill="currentColor" stroke="#3b2f3a" stroke-width="1.4"/><path d="M14 9l4-4v19l-4 4z" fill="#000" opacity=".22"/>
+      <path d="M2 9l4-4h12l-4 4z" fill="#fff" opacity=".45" stroke="#3b2f3a" stroke-width="1.4"/>
+      <g fill="#fff6c8" opacity=".9"><rect x="4" y="12" width="3" height="3"/><rect x="9" y="12" width="3" height="3"/><rect x="4" y="18" width="3" height="3"/><rect x="9" y="18" width="3" height="3"/></g>
     </symbol>`;
-  // [symbol id, width / height]
-  const SHAPES: Record<string, number> = { b0: 0.667, b1: 0.667, b2: 0.667, b3: 1.25, b4: 0.667, b5: 0.667 };
-  const pickShape = (zone: 'tall' | 'mid' | 'outer', k: number): string => {
-    const t = k * 100 % 1; // second independent-looking value from the same hash
-    const r = t;
-    if (zone === 'tall') return r < 0.34 ? 'b1' : r < 0.58 ? 'b2' : r < 0.82 ? 'b5' : 'b0';
-    if (zone === 'mid') return r < 0.42 ? 'b0' : r < 0.68 ? 'b3' : r < 0.84 ? 'b1' : r < 0.93 ? 'b5' : 'b4';
-    return r < 0.4 ? 'b4' : r < 0.72 ? 'b3' : 'b0';
-  };
 
-  const bldgs: { x: number; y: number; w: number; h: number; c: string; t: string }[] = [];
-  // deterministic "randomness" tied to a position, so the skyline is identical every visit
-  const hh = (a: number, b: number) => { const t = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return t - Math.floor(t); };
-  const gauss = (d: number, w: number) => Math.exp(-(d * d) / (2 * w * w));
+  const bldgs: { x: number; y: number; w: number; h: number; c: string }[] = [];
+  const dr = rng(21);
+  const pick = () => BUILDING_COLORS[Math.floor(dr() * BUILDING_COLORS.length)];
   const manhattan = BOROUGH_RINGS.Manhattan;
   const cx = FOCUS.x + FOCUS.w / 2, cy = FOCUS.y + FOCUS.h / 2;
-  const latOf = (y: number) => GEO.lat0 - y / GEO.k;
-  /** Skyline profile: tall in the Financial District and Midtown, lower everywhere else. */
-  const heightAt = (lat: number) => 22 + 50 * gauss(lat - 40.7075, 0.0048) + 54 * gauss(lat - 40.7555, 0.0105);
-  const tallPal = (k: number) => TALL_COLORS[Math.floor(k * 100) % TALL_COLORS.length];
-  const lowPal = (k: number) => LOW_COLORS[Math.floor(k * 100) % LOW_COLORS.length];
-  const add = (x: number, y: number, h: number, zone: 'tall' | 'mid' | 'outer', k: number) => {
-    const t = pickShape(zone, hh(k, 3.7));
-    const hh2 = t === 'b3' ? h * 0.62 : t === 'b4' ? h * 0.8 : h; // wide blocks and houses stay low
-    const w = hh2 * SHAPES[t] * (0.9 + 0.25 * hh(k, 9.1));
-    bldgs.push({ x, y, w, h: hh2, c: zone === 'tall' || hh2 > 44 ? tallPal(hh(k, 5)) : lowPal(hh(k, 11)), t });
-  };
-
-  // Manhattan: dense, three columns per avenue block, one row per street block, on the real street grid
-  for (let u = -1500; u <= 1700; u += 22) {
-    for (let j = 0; j < 14; j++) {
-      for (const side of [-21, 0, 21]) {
-        const v = -420 + 60 * j + 30 + side;
-        const x = cx + AVE.x * u + STR.x * v, y = cy + AVE.y * u + STR.y * v;
-        const ex = STR.x * 10, ey = STR.y * 10; // keep both edges of the footprint on land
-        if (!inside(manhattan, x, y) || !inside(manhattan, x + ex, y + ey) || !inside(manhattan, x - ex, y - ey) || inPark(x, y) || near(x, y, 44)) continue;
-        const k = hh(Math.round(x), Math.round(y));
-        if (k < 0.07) continue; // the odd empty lot
-        const base = heightAt(latOf(y));
-        // a wide spread of heights, with the occasional much taller tower
-        const h = base * (0.55 + 0.9 * hh(k, 1.3)) * (hh(k, 2.2) > 0.93 ? 1.6 : 1);
-        add(x, y, h, base > 46 ? 'tall' : 'mid', k);
+  // Manhattan: a dense grid aligned with the island's street grid
+  for (let u = -1500; u <= 1700; u += 26) {
+    for (let v = -420; v <= 420; v += 24) {
+      const x = cx + AVE.x * u + STR.x * v + (dr() - 0.5) * 8;
+      const y = cy + AVE.y * u + STR.y * v + (dr() - 0.5) * 8;
+      if (!inside(manhattan, x, y) || inPark(x, y) || near(x, y, 52)) continue;
+      const h = 24 + dr() * 26 + (u > -150 && u < 400 ? 14 : 0);
+      bldgs.push({ x, y, w: h * 0.66, h, c: pick() });
+    }
+  }
+  // Other boroughs: sparser, smaller
+  for (const name of ['Brooklyn', 'Queens', 'Bronx']) {
+    const ring = BOROUGH_RINGS[name];
+    for (let x = FOCUS.x - 700; x < FOCUS.x + FOCUS.w + 900; x += 58) {
+      for (let y = FOCUS.y - 500; y < FOCUS.y + FOCUS.h + 700; y += 58) {
+        const px = x + (dr() - 0.5) * 30, py = y + (dr() - 0.5) * 30;
+        if (dr() < 0.45 || !inside(ring, px, py) || inPark(px, py) || near(px, py, 52)) continue;
+        const h = 16 + dr() * 16;
+        bldgs.push({ x: px, y: py, w: h * 0.66, h, c: pick() });
       }
     }
   }
-
-  // Everywhere else: small buildings that thin out the farther they are from Manhattan and Brooklyn
-  {
-    const core = xy([40.7, -73.99]);
-    const NJ_RING = NJ.flatMap((ll) => { const q = xy(ll); return [q.x, q.y]; });
-    const lands: { ring: number[]; bonus: number }[] = [
-      { ring: BOROUGH_RINGS.Brooklyn, bonus: 1.15 }, { ring: BOROUGH_RINGS.Queens, bonus: 0.9 }, { ring: BOROUGH_RINGS.Bronx, bonus: 0.85 },
-      { ring: BOROUGH_RINGS['Staten Island'], bonus: 0.7 }, { ring: NJ_RING, bonus: 0.8 },
-    ];
-    const STEP = 40;
-    for (let gx = -500, i = 0; gx < MAP_W + 120; gx += STEP, i++) {
-      for (let gy = -60, j = 0; gy < MAP_H; gy += STEP, j++) {
-        const x = gx + (hh(i, j) - 0.5) * 18, y = gy + (hh(j, i * 1.7) - 0.5) * 18;
-        for (const land of lands) {
-          if (!inside(land.ring, x, y)) continue;
-          if (inPark(x, y) || near(x, y, 46)) break;
-          const d = Math.hypot(x - core.x, y - core.y);
-          const p = Math.max(0.06, Math.min(0.7, 0.78 * Math.exp(-d / 720) * land.bonus));
-          const k = hh(Math.round(x), Math.round(y));
-          if (k > p) break;
-          add(x, y, 15 + 13 * hh(k, 4.4) + 12 * gauss(d, 260), 'outer', k);
-          break;
-        }
-      }
-    }
-  }
-
-  // Downtown Brooklyn: a cluster of high-rises, tallest in the middle
+  // Downtown Brooklyn: a cluster of high-rises
   {
     const dtb = xy([40.6925, -73.989]);
-    for (let dx = -112; dx <= 112; dx += 26) {
-      for (let dy = -92; dy <= 92; dy += 24) {
+    for (let dx = -120; dx <= 120; dx += 22) {
+      for (let dy = -100; dy <= 100; dy += 20) {
         const d = Math.hypot(dx, dy);
-        if (d > 116) continue;
-        const x = dtb.x + dx + (hh(dx, dy) - 0.5) * 8, y = dtb.y + dy + (hh(dy, dx) - 0.5) * 8;
-        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 46)) continue;
-        const k = hh(x, y);
-        add(x, y, (36 + 34 * gauss(d, 64)) * (0.7 + 0.6 * k), 'tall', k);
+        if (d > 125) continue;
+        const x = dtb.x + dx + (dr() - 0.5) * 8, y = dtb.y + dy + (dr() - 0.5) * 8;
+        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 50)) continue;
+        const h = 38 + dr() * 30 - d * 0.12;
+        bldgs.push({ x, y, w: h * 0.62, h, c: pick() });
       }
     }
   }
   bldgs.sort((a, b) => a.y - b.y);
   const bldgSvg = bldgs
-    .map((b) => `<use href="#${b.t}" x="${(b.x - b.w / 2).toFixed(0)}" y="${(b.y - b.h).toFixed(0)}" width="${b.w.toFixed(0)}" height="${b.h.toFixed(0)}" style="color:${b.c}"/>`)
+    .map((b) => `<use href="#b" x="${(b.x - b.w / 2).toFixed(0)}" y="${(b.y - b.h).toFixed(0)}" width="${b.w.toFixed(0)}" height="${b.h.toFixed(0)}" style="color:${b.c}"/>`)
     .join('');
 
   // street grid, clipped to Manhattan
