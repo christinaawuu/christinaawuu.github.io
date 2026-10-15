@@ -18,15 +18,6 @@ const FOCUS_A = xy([40.806, -74.04]);
 const FOCUS_B = xy([40.652, -73.93]);
 const FOCUS = { x: FOCUS_A.x, y: FOCUS_A.y, w: FOCUS_B.x - FOCUS_A.x, h: FOCUS_B.y - FOCUS_A.y };
 
-function rng(seed: number): () => number {
-  return () => {
-    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 /** Closed smooth path through points (Catmull-Rom converted to cubic Beziers). */
 function smooth(pts: P[]): string {
   const n = pts.length;
@@ -64,7 +55,9 @@ export interface CityHandle {
 
 interface Beacon extends P { category: Category; live: boolean }
 
-const BUILDING_COLORS = ['#e8a598', '#f0c987', '#a8c9d8', '#b9d3a8', '#d6b8e0', '#f2d6b3', '#9fb4c8', '#e6b8c6', '#cfc8d6'];
+// Two quiet palettes: cool glass for the tall clusters, warm brick and sandstone for everything else.
+const TALL_COLORS = ['#9db6d8', '#b3a8de', '#8fb4cc', '#a7bde2'];
+const LOW_COLORS = ['#efb9a1', '#e8a79b', '#f2cf94', '#d9b4c6', '#eac39d'];
 
 // New Jersey is not in the NYC data, so its shoreline is traced by hand (latitude, longitude).
 const NJ: [number, number][] = [
@@ -130,43 +123,55 @@ export function createCity(root: HTMLElement, cb: CityCallbacks): CityHandle {
     </symbol>`;
 
   const bldgs: { x: number; y: number; w: number; h: number; c: string }[] = [];
-  const dr = rng(21);
-  const pick = () => BUILDING_COLORS[Math.floor(dr() * BUILDING_COLORS.length)];
+  // deterministic "randomness" tied to a position, so the skyline is identical every visit
+  const hh = (a: number, b: number) => { const t = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return t - Math.floor(t); };
+  const gauss = (d: number, w: number) => Math.exp(-(d * d) / (2 * w * w));
   const manhattan = BOROUGH_RINGS.Manhattan;
   const cx = FOCUS.x + FOCUS.w / 2, cy = FOCUS.y + FOCUS.h / 2;
-  // Manhattan: a dense grid aligned with the island's street grid
-  for (let u = -1500; u <= 1700; u += 26) {
-    for (let v = -420; v <= 420; v += 24) {
-      const x = cx + AVE.x * u + STR.x * v + (dr() - 0.5) * 8;
-      const y = cy + AVE.y * u + STR.y * v + (dr() - 0.5) * 8;
-      if (!inside(manhattan, x, y) || inPark(x, y) || near(x, y, 52)) continue;
-      const h = 24 + dr() * 26 + (u > -150 && u < 400 ? 14 : 0);
-      bldgs.push({ x, y, w: h * 0.66, h, c: pick() });
-    }
-  }
-  // Other boroughs: sparser, smaller
-  for (const name of ['Brooklyn', 'Queens', 'Bronx']) {
-    const ring = BOROUGH_RINGS[name];
-    for (let x = FOCUS.x - 700; x < FOCUS.x + FOCUS.w + 900; x += 58) {
-      for (let y = FOCUS.y - 500; y < FOCUS.y + FOCUS.h + 700; y += 58) {
-        const px = x + (dr() - 0.5) * 30, py = y + (dr() - 0.5) * 30;
-        if (dr() < 0.45 || !inside(ring, px, py) || inPark(px, py) || near(px, py, 52)) continue;
-        const h = 16 + dr() * 16;
-        bldgs.push({ x: px, y: py, w: h * 0.66, h, c: pick() });
+  const latOf = (y: number) => GEO.lat0 - y / GEO.k;
+  /** Skyline profile: tall in the Financial District and Midtown, low and steady everywhere else. */
+  const heightAt = (lat: number) => 24 + 48 * gauss(lat - 40.7075, 0.0048) + 52 * gauss(lat - 40.7555, 0.0105);
+  const paletteFor = (h: number, k: number) => (h > 40 ? TALL_COLORS : LOW_COLORS)[Math.floor(k * 100) % (h > 40 ? TALL_COLORS.length : LOW_COLORS.length)];
+  // Manhattan: two tidy columns of buildings per avenue block, one row per street block, all on the real street grid
+  for (let u = -1500; u <= 1700; u += 30) {
+    for (let j = 0; j < 14; j++) {
+      for (const side of [-15, 15]) {
+        const v = -420 + 60 * j + 30 + side;
+        const x = cx + AVE.x * u + STR.x * v, y = cy + AVE.y * u + STR.y * v;
+        const ex = STR.x * 13, ey = STR.y * 13; // keep both edges of the footprint on land
+        if (!inside(manhattan, x, y) || !inside(manhattan, x + ex, y + ey) || !inside(manhattan, x - ex, y - ey) || inPark(x, y) || near(x, y, 46)) continue;
+        const k = hh(Math.round(x), Math.round(y));
+        const h = heightAt(latOf(y)) * (0.8 + 0.4 * k);
+        bldgs.push({ x, y, w: 22 + Math.min(6, h * 0.06), h, c: paletteFor(h, hh(k, 7)) });
       }
     }
   }
-  // Downtown Brooklyn: a cluster of high-rises
+  // Brooklyn, Queens and the Bronx: sparse, low, evenly spaced
+  for (const name of ['Brooklyn', 'Queens', 'Bronx']) {
+    const ring = BOROUGH_RINGS[name];
+    for (let gx = FOCUS.x - 700, i = 0; gx < FOCUS.x + FOCUS.w + 900; gx += 66, i++) {
+      for (let gy = FOCUS.y - 500, j = 0; gy < FOCUS.y + FOCUS.h + 700; gy += 66, j++) {
+        const k = hh(i * 3.1, j * 5.7);
+        if (k < 0.5) continue; // leave breathing room
+        const x = gx + (i % 2) * 22, y = gy;
+        if (!inside(ring, x, y) || inPark(x, y) || near(x, y, 58)) continue;
+        const h = 18 + 12 * hh(i, j * 2.3);
+        bldgs.push({ x, y, w: 20, h, c: LOW_COLORS[Math.floor(k * 100) % LOW_COLORS.length] });
+      }
+    }
+  }
+  // Downtown Brooklyn: a small cluster of high-rises, tallest in the middle
   {
     const dtb = xy([40.6925, -73.989]);
-    for (let dx = -120; dx <= 120; dx += 22) {
-      for (let dy = -100; dy <= 100; dy += 20) {
+    for (let dx = -108; dx <= 108; dx += 30) {
+      for (let dy = -90; dy <= 90; dy += 28) {
         const d = Math.hypot(dx, dy);
-        if (d > 125) continue;
-        const x = dtb.x + dx + (dr() - 0.5) * 8, y = dtb.y + dy + (dr() - 0.5) * 8;
-        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 50)) continue;
-        const h = 38 + dr() * 30 - d * 0.12;
-        bldgs.push({ x, y, w: h * 0.62, h, c: pick() });
+        if (d > 112) continue;
+        const x = dtb.x + dx, y = dtb.y + dy;
+        if (!inside(BOROUGH_RINGS.Brooklyn, x, y) || inPark(x, y) || near(x, y, 58)) continue;
+        const k = hh(x, y);
+        const h = (40 + 30 * gauss(d, 62)) * (0.85 + 0.3 * k);
+        bldgs.push({ x, y, w: 23, h, c: TALL_COLORS[Math.floor(k * 100) % TALL_COLORS.length] });
       }
     }
   }
