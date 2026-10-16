@@ -6,7 +6,7 @@ import { asset, esc, formatDate } from './util';
 function mediaEl(m: Media): string {
   const poster = m.poster ? ` poster="${esc(asset(m.poster))}"` : '';
   if (m.type === 'image') return `<img src="${esc(asset(m.src))}" alt="${esc(m.title ?? m.caption ?? '')}" loading="lazy" />`;
-  if (m.type === 'video') return `<video src="${esc(asset(m.src))}"${poster} controls preload="none" playsinline muted></video>`;
+  if (m.type === 'video') return `<video src="${esc(asset(m.src))}"${poster} controls controlsList="nofullscreen" preload="none" playsinline muted></video><button type="button" class="vfs" aria-label="Full screen" title="Full screen">⛶</button>`;
   if (m.type === 'youtube') return `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(m.src)}" loading="lazy" title="${esc(m.title ?? m.caption ?? 'Video')}" allowfullscreen></iframe>`;
   return '';
 }
@@ -38,13 +38,39 @@ function wire(dialog: HTMLDialogElement): void {
   });
   dialog.addEventListener('click', (e) => {
     if ((e.target as HTMLElement).closest('.close')) { closeIt(); return; }
+    if ((e.target as HTMLElement).closest('.vfs, .media-item.maxed')) return; // the full-window video sits outside the card's box
     if (performance.now() - openedAt < 450) return; // the finger that opened the card
     const r = dialog.getBoundingClientRect();
     const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
     if (outside) closeIt();
   });
+  wireVideos(dialog);
   document.body.appendChild(dialog);
   dialog.showModal();
+}
+
+
+/** Full screen for videos. Native full screen is flaky inside a dialog, so try it first and fall back to a fixed full-window view. */
+function wireVideos(dialog: HTMLDialogElement): void {
+  dialog.addEventListener('click', async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('.vfs');
+    if (!btn) return;
+    const fig = btn.closest<HTMLElement>('.media-item')!;
+    const video = fig.querySelector('video')!;
+    if (fig.classList.contains('maxed')) { fig.classList.remove('maxed'); btn.textContent = '⛶'; return; }
+    try {
+      if (video.requestFullscreen) {
+        // some embedded browsers never answer, so don't wait forever
+        await Promise.race([video.requestFullscreen(), new Promise((r) => setTimeout(r, 500))]);
+        if (document.fullscreenElement) return;
+      } else {
+        const v = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+        if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); return; }
+      }
+    } catch { /* fall through to the in-page view */ }
+    fig.classList.add('maxed');
+    btn.textContent = '✕';
+  });
 }
 
 /** Only one card at a time, so a stray tap can't stack cards behind each other. */
