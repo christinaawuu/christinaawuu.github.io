@@ -17,6 +17,8 @@ export interface Media {
   title?: string;
   work?: string;
   poster?: string;
+  /** An optional code snippet shown under the write-up. */
+  code?: string;
 }
 
 export interface Project {

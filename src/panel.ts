@@ -16,7 +16,8 @@ function mediaHtml(m: Media, i: number): string {
   if (m.title) {
     const work = m.work ? `<div class="feat-label">The work</div><div class="feat-text">${marked.parse(m.work, { async: false })}</div>` : '';
     const watch = m.caption ? `<div class="feat-label">${m.type === 'image' ? 'In the shot' : 'In the video'}</div><div class="feat-text"><p>${esc(m.caption)}</p></div>` : '';
-    return `<section class="feature"><h3><span class="feat-n">${i + 1}</span>${esc(m.title)}</h3>${m.type === 'note' ? '' : `<figure class="media-item">${mediaEl(m)}</figure>`}${work}${watch}</section>`;
+    const code = m.code ? `<pre class="feat-code"><code>${esc(m.code)}</code></pre>` : '';
+    return `<section class="feature"><h3><span class="feat-n">${i + 1}</span>${esc(m.title)}</h3>${m.type === 'note' ? '' : `<figure class="media-item">${mediaEl(m)}</figure>`}${work}${code}${watch}</section>`;
   }
   const cap = m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : '';
   return `<figure class="media-item">${mediaEl(m)}${cap}</figure>`;
@@ -30,8 +31,10 @@ function wire(dialog: HTMLDialogElement): void {
   const openedAt = performance.now();
   const closeIt = () => { if (dialog.open) dialog.close(); };
   dialog.addEventListener('close', () => dialog.remove());
+  // Phones sometimes drop the click, so pointerup is the fallback. It waits, so the click that follows a tap lands on the X
+  // and not on whatever card sits behind the dialog once it has closed.
   dialog.addEventListener('pointerup', (e) => {
-    if ((e.target as HTMLElement).closest('.close')) { e.preventDefault(); closeIt(); }
+    if ((e.target as HTMLElement).closest('.close')) window.setTimeout(closeIt, 400);
   });
   dialog.addEventListener('click', (e) => {
     if ((e.target as HTMLElement).closest('.close')) { closeIt(); return; }

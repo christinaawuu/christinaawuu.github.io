@@ -257,3 +257,4 @@ html { -webkit-text-size-adjust: 100%; }
 .feat-text p { margin: 2px 0 4px; }
 .feat-text ul { margin: 2px 0 4px; padding-left: 18px; }
 .feature h3 { padding-right: 34px; }
+.feat-code { margin: 8px 0; padding: 12px 14px; border-radius: 12px; background: #2b2433; color: #f3ecf7; font: 12.5px/1.5 ui-monospace, 'Cascadia Code', Consolas, monospace; overflow-x: auto; white-space: pre; }

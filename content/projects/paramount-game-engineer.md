@@ -54,6 +54,13 @@ media:
       - One shared spawn helper (using the actor pool) serves both commands.
       - Drop styles are an editor-picked, extensible selector with random-cone scatter and a configurable fan spread.
     caption: I use exec commands to drop a single item, then a stack of one class, then the different fan patterns.
+  - type: note
+    src: ""
+    title: Error handling and robustness pass (shared plugin code)
+    work: >-
+      Hardened shared plugin code, not a new feature. I audited the AI subsystem, formations, controller, patrol paths, and animation classes
+      (notifies, anim instances, IK component) and added error handling and logging for failure cases, so problems now say what went wrong instead of failing silently.
+      I also made the patrol path status log report the cause of a failure.
 ---
 
 - Architected an Unreal C++ item-drop system, consolidating 5 legacy functions into 3 while preserving object-oriented design.
