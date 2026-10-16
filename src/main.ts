@@ -27,7 +27,8 @@ let careerCleanup: (() => void) | null = null;
 let hideTimer = 0; // hides the map once a neighborhood has faded in over it
 
 // day / night: follows the visitor's clock until they press the toggle
-const saved = localStorage.getItem('theme');
+let saved: string | null = null;
+try { saved = localStorage.getItem('theme'); } catch { /* storage blocked (private mode) */ }
 const hour = new Date().getHours();
 const setNight = (on: boolean) => document.body.classList.toggle('night', on);
 setNight(saved ? saved === 'night' : hour < 6 || hour >= 19);
@@ -135,8 +136,8 @@ hud.addEventListener('click', (e) => {
   if (!(e.target as HTMLElement).closest('.night-toggle')) return;
   const on = !document.body.classList.contains('night');
   setNight(on);
-  localStorage.setItem('theme', on ? 'night' : 'day');
   (e.target as HTMLElement).closest('.night-toggle')!.textContent = on ? '☀️ Day' : '🌙 Night';
+  try { localStorage.setItem('theme', on ? 'night' : 'day'); } catch { /* storage blocked */ }
 });
 
 // resume viewer and contact form, from anywhere on the site

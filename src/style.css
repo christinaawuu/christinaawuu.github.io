@@ -237,3 +237,11 @@ body.night .cloud { opacity: .35; }
   .hud-world .hud-tools { gap: 5px; }
 }
 .panel { --accent: #e8505b; } /* default for panels with no neighborhood color (contact, resume) */
+
+/* iOS zooms the whole page when a field under 16px gets focus, and keeps that zoom after a refresh, which pushes the HUD off screen */
+html { -webkit-text-size-adjust: 100%; }
+.contact-form input, .contact-form textarea { font-size: 16px; touch-action: manipulation; }
+.hud-tools button, .hud-tools a, .tab, .hud-btn, .city-zoom button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (max-width: 700px) {
+  .contact-panel { margin: 10px auto auto; } /* top-aligned so the on-screen keyboard doesn't shove it around */
+}
