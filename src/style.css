@@ -46,7 +46,9 @@ h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.4rem); }
 .panel::backdrop { background: rgba(43, 36, 51, 0.5); }
 .panel h2 { margin: 10px 0 8px; }
 .panel .hero { width: 100%; border-radius: 12px; margin: 12px 0; }
-.panel .close { position: absolute; top: 10px; right: 14px; border: none; background: none; font-size: 1.8rem; cursor: pointer; color: var(--muted); }
+.panel { max-height: 88vh; max-height: 88dvh; overflow-y: auto; overscroll-behavior: contain; }
+/* sticky so the X stays reachable while a long card scrolls; 44px tap target for thumbs */
+.panel .close { position: sticky; top: -14px; float: right; z-index: 5; width: 44px; height: 44px; margin: -14px -14px 0 8px; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.92); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); font-size: 1.8rem; line-height: 1; cursor: pointer; color: var(--ink); touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .media-item { margin: 14px 0 0; }
 .media-item img, .media-item video, .media-item iframe { width: 100%; border-radius: 12px; border: 0; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
 .media-item img { background: none; aspect-ratio: auto; }
