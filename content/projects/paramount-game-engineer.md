@@ -68,7 +68,7 @@ media:
       // After: a readable log and a safe early exit
       if (InObserver == nullptr)
       {
-          UE_LOG(LogSDIGamePlugin, Error, TEXT("%s: AddObserver - Unable to add Null Observer."),
+          UE_LOG(LogTemp, Error, TEXT("%s: AddObserver - Unable to add Null Observer."),
               *USDIUtil::GetReadableNameSafe(this));
           return;
       }
