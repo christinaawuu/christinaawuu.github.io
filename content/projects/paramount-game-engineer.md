@@ -46,8 +46,8 @@ media:
       A teammate integrated and submitted this work.
     caption: I turn on the debug rings, walk out of the red despawn range so the enemies despawn, then back inside the green resume range so the same wave respawns.
   - type: video
-    src: videos/paramount/inventory-drop.mp4
-    poster: videos/paramount/inventory-drop.jpg
+    src: videos/paramount/inventory-drop-fan.mp4
+    poster: videos/paramount/inventory-drop-fan.jpg
     title: Inventory drop system
     work: |-
       Implemented the "inventory to world" path for a record-based inventory.
@@ -55,7 +55,7 @@ media:
       - **Drop Inventory** drops N items of a class and splits stacked records when only part of a stack is dropped.
       - One shared spawn helper (using the actor pool) serves both commands.
       - Drop styles are an editor-picked, extensible selector with random-cone scatter and a configurable fan spread.
-    caption: I use exec commands to drop a single item, then a stack of one class, with the random drop style.
+    caption: "Fan style: I drop items with the exec commands and they spread evenly across the fan."
     extra:
       - type: video
         src: videos/paramount/drop-style-random.mp4
@@ -65,28 +65,6 @@ media:
         src: videos/paramount/drop-style-fan-settings.mp4
         poster: videos/paramount/drop-style-fan-settings.jpg
         caption: "Switching the drop style to Fan in the editor and setting the fan's angle width."
-      - type: video
-        src: videos/paramount/inventory-drop-fan.mp4
-        poster: videos/paramount/inventory-drop-fan.jpg
-        caption: "Fan style: the same drop commands, now spreading items evenly across the fan."
-  - type: note
-    src: ""
-    title: Reliability and error-handling pass (AI and animation plugin code)
-    work: >-
-      Audited shared AI code (formations, controllers, patrol paths, subsystem) and animation code (notifies, anim instances, IK).
-      I replaced hard crashes (check and assert-style ensureMsgf) with readable error logs and safe early exits, so bad data no longer takes down the game.
-      I also made the patrol-path failure log report the pawn, path actor, status, path IDs and failure reason, so problems can be diagnosed from the log alone.
-    code: |-
-      // Before: bad data crashes the game
-      check(InObserver != nullptr);
-
-      // After: a readable log and a safe early exit
-      if (InObserver == nullptr)
-      {
-          UE_LOG(LogTemp, Error, TEXT("%s: AddObserver - Unable to add Null Observer."),
-              *USDIUtil::GetReadableNameSafe(this));
-          return;
-      }
 ---
 
 - Architected an Unreal C++ item-drop system, consolidating 5 legacy functions into 3 while preserving object-oriented design.
