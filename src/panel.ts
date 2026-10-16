@@ -16,8 +16,9 @@ function mediaHtml(m: Media, i: number): string {
   if (m.title) {
     const work = m.work ? `<div class="feat-label">The work</div><div class="feat-text">${marked.parse(m.work, { async: false })}</div>` : '';
     const watch = m.caption ? `<div class="feat-label">${m.type === 'image' ? 'In the shot' : 'In the video'}</div><div class="feat-text"><p>${esc(m.caption)}</p></div>` : '';
+    const extras = (m.extra ?? []).map((x) => `<figure class="media-item extra">${mediaEl(x)}${x.caption ? `<figcaption>${esc(x.caption)}</figcaption>` : ''}</figure>`).join('');
     const code = m.code ? `<pre class="feat-code"><code>${esc(m.code)}</code></pre>` : '';
-    return `<section class="feature"><h3><span class="feat-n">${i + 1}</span>${esc(m.title)}</h3>${m.type === 'note' ? '' : `<figure class="media-item">${mediaEl(m)}</figure>`}${work}${code}${watch}</section>`;
+    return `<section class="feature"><h3><span class="feat-n">${i + 1}</span>${esc(m.title)}</h3>${m.type === 'note' ? '' : `<figure class="media-item">${mediaEl(m)}</figure>`}${work}${code}${watch}${extras}</section>`;
   }
   const cap = m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : '';
   return `<figure class="media-item">${mediaEl(m)}${cap}</figure>`;

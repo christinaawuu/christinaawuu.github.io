@@ -34,8 +34,9 @@ media:
       The in-game debug menu builds its Spawn and Despawn buttons from the entries in a config Data Asset, so engineers and designers can add new tags
       without hand-editing a Blueprint or writing UI code. This gives QA and engineers one-click setup and teardown of test scenarios.
     caption: The debug menu and the console commands spawning and despawning actors by tag.
-  - type: note
-    src: ""
+  - type: video
+    src: videos/paramount/spawn-despawn-range.mp4
+    poster: videos/paramount/spawn-despawn-range.jpg
     title: Spawner despawn and respawn in player range
     work: >-
       Fixed and extended how encounter spawners behave when the player leaves and returns.
@@ -43,6 +44,7 @@ media:
       and returning players now get the exact wave they left, with wave progression intact.
       I also built a console-variable debug view with distance lines and despawn/resume rings, and made the despawn check interval designer-tunable.
       A teammate integrated and submitted this work.
+    caption: I turn on the debug rings, walk out of the red despawn range so the enemies despawn, then back inside the green resume range so the same wave respawns.
   - type: video
     src: videos/paramount/inventory-drop.mp4
     poster: videos/paramount/inventory-drop.jpg
@@ -53,7 +55,20 @@ media:
       - **Drop Inventory** drops N items of a class and splits stacked records when only part of a stack is dropped.
       - One shared spawn helper (using the actor pool) serves both commands.
       - Drop styles are an editor-picked, extensible selector with random-cone scatter and a configurable fan spread.
-    caption: I use exec commands to drop a single item, then a stack of one class, then the different fan patterns.
+    caption: I use exec commands to drop a single item, then a stack of one class, with the random drop style.
+    extra:
+      - type: video
+        src: videos/paramount/drop-style-random.mp4
+        poster: videos/paramount/drop-style-random.jpg
+        caption: "Random style: items scatter in a random cone."
+      - type: video
+        src: videos/paramount/drop-style-fan-settings.mp4
+        poster: videos/paramount/drop-style-fan-settings.jpg
+        caption: "Switching the drop style to Fan in the editor and setting the fan's angle width."
+      - type: video
+        src: videos/paramount/inventory-drop-fan.mp4
+        poster: videos/paramount/inventory-drop-fan.jpg
+        caption: "Fan style: the same drop commands, now spreading items evenly across the fan."
   - type: note
     src: ""
     title: Reliability and error-handling pass (AI and animation plugin code)

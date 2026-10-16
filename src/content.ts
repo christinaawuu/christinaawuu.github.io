@@ -19,6 +19,8 @@ export interface Media {
   poster?: string;
   /** An optional code snippet shown under the write-up. */
   code?: string;
+  /** More clips for the same feature, shown after the main one, each with its own caption. */
+  extra?: Media[];
 }
 
 export interface Project {
