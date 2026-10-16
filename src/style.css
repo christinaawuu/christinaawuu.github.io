@@ -269,3 +269,17 @@ html { -webkit-text-size-adjust: 100%; }
 .feature .media-item.extra { margin: 12px 0 0; }
 .feature .media-item.extra figcaption { font-size: .88rem; color: var(--ink); margin-top: 6px; }
 .feature .media-item.extra video { max-height: 48vh; }
+
+/* ---------- video carousel ---------- */
+.carousel { position: relative; margin: 0 0 10px; }
+.car-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 12px; border-radius: 12px; overscroll-behavior-x: contain; }
+.car-track::-webkit-scrollbar { display: none; }
+.carousel .slide { flex: 0 0 100%; scroll-snap-align: center; margin: 0; }
+.carousel .slide video { max-height: 50vh; aspect-ratio: auto; }
+.carousel .slide figcaption { font-size: .88rem; color: var(--ink); margin-top: 6px; min-height: 2.6em; }
+.car-btn { position: absolute; top: 26%; width: 38px; height: 38px; border: none; border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 2px 8px rgba(0, 0, 0, .3); font-size: 1.5rem; line-height: 1; color: var(--ink); cursor: pointer; touch-action: manipulation; z-index: 3; padding: 0 0 3px; }
+.car-btn.prev { left: 8px; } .car-btn.next { right: 8px; }
+.car-dots { display: flex; justify-content: center; gap: 4px; margin-top: 4px; }
+.car-dot { width: 26px; height: 26px; border: none; background: none; padding: 0; cursor: pointer; position: relative; touch-action: manipulation; }
+.car-dot::after { content: ''; position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #d8cdb8; transition: background .2s, transform .2s; }
+.car-dot.on::after { background: var(--accent); transform: scale(1.35); }

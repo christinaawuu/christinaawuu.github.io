@@ -16,9 +16,14 @@ function mediaHtml(m: Media, i: number): string {
   if (m.title) {
     const work = m.work ? `<div class="feat-label">The work</div><div class="feat-text">${marked.parse(m.work, { async: false })}</div>` : '';
     const watch = m.caption ? `<div class="feat-label">${m.type === 'image' ? 'In the shot' : 'In the video'}</div><div class="feat-text"><p>${esc(m.caption)}</p></div>` : '';
-    const extras = (m.extra ?? []).map((x) => `<figure class="media-item extra">${mediaEl(x)}${x.caption ? `<figcaption>${esc(x.caption)}</figcaption>` : ''}</figure>`).join('');
+    const slides = [m, ...(m.extra ?? [])];
+    const carousel = m.extra?.length
+      ? `<div class="carousel"><div class="car-track">${slides.map((x) => `<figure class="media-item slide">${mediaEl(x)}${x.caption ? `<figcaption>${esc(x.caption)}</figcaption>` : ''}</figure>`).join('')}</div>
+          <button type="button" class="car-btn prev" aria-label="Previous video">‹</button><button type="button" class="car-btn next" aria-label="Next video">›</button>
+          <div class="car-dots">${slides.map((_, k) => `<button type="button" class="car-dot${k ? '' : ' on'}" data-i="${k}" aria-label="Video ${k + 1} of ${slides.length}"></button>`).join('')}</div></div>`
+      : '';
     const code = m.code ? `<pre class="feat-code"><code>${esc(m.code)}</code></pre>` : '';
-    return `<section class="feature"><h3><span class="feat-n">${i + 1}</span>${esc(m.title)}</h3>${m.type === 'note' ? '' : `<figure class="media-item">${mediaEl(m)}</figure>`}${work}${code}${watch}${extras}</section>`;
+    return `<section class="feature"><h3><span class="feat-n">${i + 1}</span>${esc(m.title)}</h3>${carousel || (m.type === 'note' ? '' : `<figure class="media-item">${mediaEl(m)}</figure>`)}${work}${code}${carousel ? '' : watch}</section>`;
   }
   const cap = m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : '';
   return `<figure class="media-item">${mediaEl(m)}${cap}</figure>`;
@@ -41,11 +46,13 @@ function wire(dialog: HTMLDialogElement): void {
     if ((e.target as HTMLElement).closest('.close')) { closeIt(); return; }
     if ((e.target as HTMLElement).closest('.vfs, .media-item.maxed')) return; // the full-window video sits outside the card's box
     if (performance.now() - openedAt < 450) return; // the finger that opened the card
+    if (e.target !== dialog) return; // only a tap on the backdrop (or the card's own padding) can count as outside
     const r = dialog.getBoundingClientRect();
     const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
     if (outside) closeIt();
   });
   wireVideos(dialog);
+  wireCarousels(dialog);
   document.body.appendChild(dialog);
   dialog.showModal();
 }
@@ -71,6 +78,27 @@ function wireVideos(dialog: HTMLDialogElement): void {
     } catch { /* fall through to the in-page view */ }
     fig.classList.add('maxed');
     btn.textContent = '✕';
+  });
+}
+
+/** Swipeable video carousel: arrows, dots, and only one video playing at a time. */
+function wireCarousels(dialog: HTMLDialogElement): void {
+  dialog.querySelectorAll<HTMLElement>('.carousel').forEach((car) => {
+    const track = car.querySelector<HTMLElement>('.car-track')!;
+    const dots = [...car.querySelectorAll<HTMLElement>('.car-dot')];
+    const go = (i: number) => track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+    const index = () => Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+    car.querySelector('.prev')!.addEventListener('click', () => go(Math.max(0, index() - 1)));
+    car.querySelector('.next')!.addEventListener('click', () => go(Math.min(dots.length - 1, index() + 1)));
+    dots.forEach((d) => d.addEventListener('click', () => go(Number(d.dataset.i))));
+    let last = 0;
+    track.addEventListener('scroll', () => {
+      const i = index();
+      if (i === last) return;
+      last = i;
+      dots.forEach((d, k) => d.classList.toggle('on', k === i));
+      track.querySelectorAll('video').forEach((v) => v.pause()); // leaving a slide stops its video
+    }, { passive: true });
   });
 }
 
