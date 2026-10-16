@@ -21,7 +21,6 @@ const ART: [string, number, number, number, number, number][] = [
   [`<svg viewBox="0 0 70 50" ${STROKE}><rect x="6" y="6" width="58" height="38" rx="6" fill="#fdf6ec"/><path d="M12 36l12-14 10 10 8-8 14 12" stroke="#4f9d8f"/><circle cx="50" cy="18" r="4" fill="#f6c453"/></svg>`, 84, 92, 90, 0.2, 6],
 ];
 
-const parts = (p: Project) => p.categories.map((c) => neighborhoodFor(c));
 
 function card(p: Project): string {
   const n = neighborhoodFor(p.category);
@@ -36,7 +35,7 @@ function card(p: Project): string {
         <span class="date">${esc(formatDate(p))}</span>
         <h3>${esc(p.title)}</h3>
         <p>${esc(p.summary)}</p>
-        <ul class="tags">${parts(p).map((x) => `<li class="place">📍 ${esc(x.name)}</li>`).join('')}${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+        <ul class="tags"><li class="place">📍 ${esc(n.name)}</li>${p.categories.slice(1).map((c) => `<li class="overlap" style="--oc:${neighborhoodFor(c).color}">${neighborhoodFor(c).icon} ${esc(neighborhoodFor(c).label)}</li>`).join('')}${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
       </div>
     </button>`;
 }

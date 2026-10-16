@@ -80,12 +80,11 @@ const cardOpen = () => !!document.querySelector('dialog.panel[open]');
  * Open a project in a modal panel. On the career page every category shows its neighborhood as a tag. Opened from the map, the card
  * shows only the neighborhood you are standing in, and its other categories appear as separate overlap tags.
  */
-export function openProject(p: Project, from: 'career' | 'world' = 'career'): void {
+export function openProject(p: Project, _from: 'career' | 'world' = 'career'): void {
   if (cardOpen()) return;
   const n = neighborhoodFor(p.category);
-  const placeTags = from === 'world'
-    ? `<li class="place">📍 ${esc(n.name)}</li>${p.categories.slice(1).map((c) => `<li class="overlap" style="--oc:${neighborhoodFor(c).color}">${neighborhoodFor(c).icon} ${esc(neighborhoodFor(c).label)}</li>`).join('')}`
-    : p.categories.map((c) => `<li class="place">📍 ${esc(neighborhoodFor(c).name)}</li>`).join('');
+  // one place tag (where its building stands on the map), with its other categories as overlap chips
+  const placeTags = `<li class="place">📍 ${esc(n.name)}</li>${p.categories.slice(1).map((c) => `<li class="overlap" style="--oc:${neighborhoodFor(c).color}">${neighborhoodFor(c).icon} ${esc(neighborhoodFor(c).label)}</li>`).join('')}`;
   const dialog = document.createElement('dialog');
   dialog.className = 'panel';
   dialog.style.setProperty('--accent', n.color);
