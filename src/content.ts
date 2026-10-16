@@ -10,9 +10,13 @@ export interface ProjectLink {
 export type Surface = 'world' | 'career';
 
 export interface Media {
-  type: 'image' | 'video' | 'youtube';
+  type: 'image' | 'video' | 'youtube' | 'note';
   src: string;
   caption?: string;
+  /** Feature blocks: a heading, what I built (markdown), and what the video shows (the caption). 'note' blocks have no media. */
+  title?: string;
+  work?: string;
+  poster?: string;
 }
 
 export interface Project {
@@ -106,7 +110,7 @@ function toProject(path: string, raw: string): Project | null {
     : [];
 
   const media = Array.isArray(data.media)
-    ? (data.media as Media[]).filter((m) => m?.src && ['image', 'video', 'youtube'].includes(m.type))
+    ? (data.media as Media[]).filter((m) => m && (m.type === 'note' ? m.title : m.src) && ['image', 'video', 'youtube', 'note'].includes(m.type))
     : [];
   const showIn = Array.isArray(data.showIn)
     ? (data.showIn as string[]).filter((s): s is Surface => s === 'world' || s === 'career')

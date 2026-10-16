@@ -3,12 +3,23 @@ import type { Media, Project, SignInfo } from './content';
 import { neighborhoodFor } from './neighborhoods';
 import { asset, esc, formatDate } from './util';
 
-function mediaHtml(m: Media): string {
+function mediaEl(m: Media): string {
+  const poster = m.poster ? ` poster="${esc(asset(m.poster))}"` : '';
+  if (m.type === 'image') return `<img src="${esc(asset(m.src))}" alt="${esc(m.title ?? m.caption ?? '')}" loading="lazy" />`;
+  if (m.type === 'video') return `<video src="${esc(asset(m.src))}"${poster} controls preload="none" playsinline muted></video>`;
+  if (m.type === 'youtube') return `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(m.src)}" loading="lazy" title="${esc(m.title ?? m.caption ?? 'Video')}" allowfullscreen></iframe>`;
+  return '';
+}
+
+function mediaHtml(m: Media, i: number): string {
+  // a feature block: numbered heading, the media, then what I built and what the video shows
+  if (m.title) {
+    const work = m.work ? `<div class="feat-label">The work</div><div class="feat-text">${marked.parse(m.work, { async: false })}</div>` : '';
+    const watch = m.caption ? `<div class="feat-label">${m.type === 'image' ? 'In the shot' : 'In the video'}</div><div class="feat-text"><p>${esc(m.caption)}</p></div>` : '';
+    return `<section class="feature"><h3><span class="feat-n">${i + 1}</span>${esc(m.title)}</h3>${m.type === 'note' ? '' : `<figure class="media-item">${mediaEl(m)}</figure>`}${work}${watch}</section>`;
+  }
   const cap = m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : '';
-  if (m.type === 'image') return `<figure class="media-item"><img src="${esc(asset(m.src))}" alt="${esc(m.caption ?? '')}" loading="lazy" />${cap}</figure>`;
-  if (m.type === 'video') return `<figure class="media-item"><video src="${esc(asset(m.src))}" controls preload="none" playsinline></video>${cap}</figure>`;
-  const id = encodeURIComponent(m.src);
-  return `<figure class="media-item"><iframe src="https://www.youtube-nocookie.com/embed/${id}" loading="lazy" title="${esc(m.caption ?? 'Video')}" allowfullscreen></iframe>${cap}</figure>`;
+  return `<figure class="media-item">${mediaEl(m)}${cap}</figure>`;
 }
 
 /**
@@ -57,7 +68,7 @@ export function openProject(p: Project, from: 'career' | 'world' = 'career'): vo
     <ul class="tags">${placeTags}${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
     ${p.cover ? `<img class="hero" src="${esc(asset(p.cover))}" alt="" />` : ''}
     <div class="body">${marked.parse(p.body, { async: false })}</div>
-    ${p.media.map(mediaHtml).join('')}
+    ${p.media.some((m) => m.title) ? '<h3 class="feat-head">What I built</h3>' : ''}${p.media.map(mediaHtml).join('')}
     <div class="links">${p.links
       .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`)
       .join('')}</div>`;

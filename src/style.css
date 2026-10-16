@@ -245,3 +245,15 @@ html { -webkit-text-size-adjust: 100%; }
 @media (max-width: 700px) {
   .contact-panel { margin: 10px auto auto; } /* top-aligned so the on-screen keyboard doesn't shove it around */
 }
+
+/* ---------- feature blocks inside a project card (video + what I built + what the video shows) ---------- */
+.feat-head { margin: 22px 0 4px; font-size: 1.05rem; }
+.feature { margin-top: 18px; padding-top: 16px; border-top: 2px dashed #e6dcc8; }
+.feature h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: 1.02rem; line-height: 1.25; }
+.feat-n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: .8rem; font-weight: 900; display: grid; place-items: center; }
+.feature .media-item { margin: 0 0 10px; }
+.feature .media-item video { aspect-ratio: auto; max-height: 56vh; object-fit: contain; }
+.feat-label { margin-top: 8px; font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.feat-text p { margin: 2px 0 4px; }
+.feat-text ul { margin: 2px 0 4px; padding-left: 18px; }
+.feature h3 { padding-right: 34px; }
