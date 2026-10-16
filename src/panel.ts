@@ -12,10 +12,36 @@ function mediaHtml(m: Media): string {
 }
 
 /**
+ * Shared dialog wiring. The X closes on tap (pointerup as well as click, since phones can drop the click),
+ * a tap outside the card closes it, and the tap that opened the card can't immediately close it.
+ */
+function wire(dialog: HTMLDialogElement): void {
+  const openedAt = performance.now();
+  const closeIt = () => { if (dialog.open) dialog.close(); };
+  dialog.addEventListener('close', () => dialog.remove());
+  dialog.addEventListener('pointerup', (e) => {
+    if ((e.target as HTMLElement).closest('.close')) { e.preventDefault(); closeIt(); }
+  });
+  dialog.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('.close')) { closeIt(); return; }
+    if (performance.now() - openedAt < 450) return; // the finger that opened the card
+    const r = dialog.getBoundingClientRect();
+    const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    if (outside) closeIt();
+  });
+  document.body.appendChild(dialog);
+  dialog.showModal();
+}
+
+/** Only one card at a time, so a stray tap can't stack cards behind each other. */
+const cardOpen = () => !!document.querySelector('dialog.panel[open]');
+
+/**
  * Open a project in a modal panel. On the career page every category shows its neighborhood as a tag. Opened from the map, the card
  * shows only the neighborhood you are standing in, and its other categories appear as separate overlap tags.
  */
 export function openProject(p: Project, from: 'career' | 'world' = 'career'): void {
+  if (cardOpen()) return;
   const n = neighborhoodFor(p.category);
   const placeTags = from === 'world'
     ? `<li class="place">📍 ${esc(n.name)}</li>${p.categories.slice(1).map((c) => `<li class="overlap" style="--oc:${neighborhoodFor(c).color}">${neighborhoodFor(c).icon} ${esc(neighborhoodFor(c).label)}</li>`).join('')}`
@@ -35,16 +61,12 @@ export function openProject(p: Project, from: 'career' | 'world' = 'career'): vo
     <div class="links">${p.links
       .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`)
       .join('')}</div>`;
-  dialog.addEventListener('close', () => dialog.remove());
-  dialog.addEventListener('click', (e) => {
-    if (e.target === dialog || (e.target as HTMLElement).closest('.close')) dialog.close();
-  });
-  document.body.appendChild(dialog);
-  dialog.showModal();
+  wire(dialog);
 }
 
 /** The neighborhood guide sign: what this neighborhood is, plus my recommendations when I have added them. */
 export function openSign(info: SignInfo): void {
+  if (cardOpen()) return;
   const n = neighborhoodFor(info.category);
   const dialog = document.createElement('dialog');
   dialog.className = 'panel sign-panel';
@@ -55,24 +77,15 @@ export function openSign(info: SignInfo): void {
     <h2>${esc(info.title || n.name)}</h2>
     <div class="body">${marked.parse(info.body, { async: false })}</div>
     ${info.picks.length ? `<h3 class="picks-h">📍 My picks</h3><ul class="picks">${info.picks.map((p) => `<li><b>${esc(p.name)}</b>${p.note ? `<span>${esc(p.note)}</span>` : ''}</li>`).join('')}</ul>` : ''}`;
-  dialog.addEventListener('close', () => dialog.remove());
-  dialog.addEventListener('click', (e) => {
-    if (e.target === dialog || (e.target as HTMLElement).closest('.close')) dialog.close();
-  });
-  document.body.appendChild(dialog);
-  dialog.showModal();
+  wire(dialog);
 }
 
 function shell(cls: string, inner: string): HTMLDialogElement {
+  document.querySelector('dialog.panel[open]')?.dispatchEvent(new Event('close')); // replace whatever is open
   const dialog = document.createElement('dialog');
   dialog.className = `panel ${cls}`;
   dialog.innerHTML = `<button class="close" aria-label="Close">×</button>${inner}`;
-  dialog.addEventListener('close', () => dialog.remove());
-  dialog.addEventListener('click', (e) => {
-    if (e.target === dialog || (e.target as HTMLElement).closest('.close')) dialog.close();
-  });
-  document.body.appendChild(dialog);
-  dialog.showModal();
+  wire(dialog);
   return dialog;
 }
 

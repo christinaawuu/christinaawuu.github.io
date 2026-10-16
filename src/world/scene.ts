@@ -439,6 +439,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
   /** Tap a building to walk up to it and open it; tap anywhere else to walk there. */
   stage.addEventListener('pointerdown', (e) => {
     if ((e.target as HTMLElement).closest('.scene-prompt, .scene-zoom')) return;
+    if (document.querySelector('dialog[open]')) return;
     touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (touches.size > 1) { player.target = null; pending = null; return; } // a pinch, not a tap
     const wx = e.clientX / scale + camX, wy = e.clientY / scale + camY;
@@ -490,6 +491,7 @@ export function createScene(root: HTMLElement, category: Category, cb: SceneCall
     if (svg) { svg.dataset.dir = player.dir; svg.classList.toggle('moving', player.moving); }
 
     // a tapped building opens as soon as the player arrives
+    if (pending && document.querySelector('dialog[open]')) { pending = null; player.target = null; }
     if (pending && Math.hypot(pending.x - player.x, pending.y - player.y) < Math.min(pending.r * 0.8, 70)) {
       const l = pending; pending = null; player.target = null; activate(l);
     }

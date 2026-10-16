@@ -206,3 +206,34 @@ body.night .cloud { opacity: .35; }
 @keyframes torch { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12, 1.18); } }
 
 .tags li.overlap { background: color-mix(in srgb, var(--oc, #999) 20%, white); border: 1.5px dashed var(--oc, #999); font-weight: 700; }
+
+/* ---------- phones: compact HUD, thumb-sized but tidy controls, nothing overlapping ---------- */
+@media (max-width: 700px) {
+  .hud-world { left: 8px; right: 8px; top: 8px; max-width: none; padding: 7px 10px 8px; border-radius: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .hud-world h1 { flex: 1 1 auto; font-size: .92rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hud-btn { order: 1; margin: 0; padding: 4px 10px; font-size: .72rem; border: 2px solid #3b2f3a; }
+  .hud-world .modes, .hud-world .hud-tools { order: 2; flex: 1 1 100%; display: flex; flex-wrap: nowrap; gap: 5px; margin: 0; overflow-x: auto; scrollbar-width: none; }
+  .hud-world .modes::-webkit-scrollbar, .hud-world .hud-tools::-webkit-scrollbar { display: none; }
+  .hud-world .tab { padding: 4px 10px; font-size: .72rem; white-space: nowrap; flex: none; border-width: 2px; }
+  .hud-tools a, .hud-tools button { font-size: .72rem; padding: 3px 9px; white-space: nowrap; flex: none; }
+  .city-compass { display: none; }
+  .city-zoom { right: 10px; bottom: 10px; gap: 6px; }
+  .city-zoom button { width: 40px; height: 40px; font-size: 1.2rem; border-width: 2px; }
+  .city-skip { left: 10px; bottom: 10px; font-size: .78rem; padding: 7px 12px; border-width: 2px; box-shadow: 0 3px 0 rgba(59,47,58,.35); }
+  .city-hint { bottom: 62px; max-width: calc(100vw - 100px); font-size: .72rem; padding: 6px 12px; white-space: normal; text-align: center; }
+  /* the prompt sits bottom-left, clear of the zoom buttons; the toast sits just above it */
+  .scene-prompt { left: 10px; right: 62px; bottom: 10px; transform: none; max-width: none; padding: 8px 12px; gap: 8px; border-width: 2px; font-size: .8rem; justify-content: space-between; text-align: left; }
+  .scene-prompt .pt > span { display: none; }
+  .scene-prompt .act { padding: 6px 12px; font-size: .78rem; }
+  .scene-toast, #toast { left: 10px; right: 62px; transform: none; bottom: 70px; max-width: none; padding: 7px 12px; font-size: .78rem; border-radius: 10px; text-align: left; }
+  .scene .tag { font-size: 11px; padding: 3px 9px; max-width: 150px; }
+  .scene .bubble { font-size: 11px; padding: 3px 8px; }
+  .panel { max-width: 94vw; width: 94vw; padding: 18px 16px 20px; border-radius: 18px; }
+  .panel h2 { font-size: 1.25rem; }
+  .btn { padding: 9px 16px; font-size: .9rem; }
+}
+@media (max-width: 700px) {
+  .hud-world .modes .tab, .hud-world .hud-tools > * { flex: 1 1 0; text-align: center; display: block; box-sizing: border-box; }
+  .hud-world .hud-tools { gap: 5px; }
+}
+.panel { --accent: #e8505b; } /* default for panels with no neighborhood color (contact, resume) */
