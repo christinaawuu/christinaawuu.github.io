@@ -56,11 +56,22 @@ media:
     caption: I use exec commands to drop a single item, then a stack of one class, then the different fan patterns.
   - type: note
     src: ""
-    title: Error handling and robustness pass (shared plugin code)
+    title: Reliability and error-handling pass (AI and animation plugin code)
     work: >-
-      Hardened shared plugin code, not a new feature. I audited the AI subsystem, formations, controller, patrol paths, and animation classes
-      (notifies, anim instances, IK component) and added error handling and logging for failure cases, so problems now say what went wrong instead of failing silently.
-      I also made the patrol path status log report the cause of a failure.
+      Audited shared AI code (formations, controllers, patrol paths, subsystem) and animation code (notifies, anim instances, IK).
+      I replaced hard crashes (check and assert-style ensureMsgf) with readable error logs and safe early exits, so bad data no longer takes down the game.
+      I also made the patrol-path failure log report the pawn, path actor, status, path IDs and failure reason, so problems can be diagnosed from the log alone.
+    code: |-
+      // Before: bad data crashes the game
+      check(InObserver != nullptr);
+
+      // After: a readable log and a safe early exit
+      if (InObserver == nullptr)
+      {
+          UE_LOG(LogSDIGamePlugin, Error, TEXT("%s: AddObserver - Unable to add Null Observer."),
+              *USDIUtil::GetReadableNameSafe(this));
+          return;
+      }
 ---
 
 - Architected an Unreal C++ item-drop system, consolidating 5 legacy functions into 3 while preserving object-oriented design.
