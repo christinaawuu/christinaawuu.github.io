@@ -43,7 +43,10 @@ function toast(msg: string): void {
 function renderHud(mode: 'city' | 'scene' | 'career', category?: Category): void {
   const tab = (href: string, label: string, active: boolean) =>
     `<a class="tab${active ? ' active' : ''}" href="${href}" ${active ? 'aria-current="page"' : ''}>${label}</a>`;
-  const nav = `<nav class="modes" aria-label="View mode">${tab('#/explore', '🗽 My NYC', mode !== 'career')}${tab('#/career', '📜 Career', mode === 'career')}</nav>`;
+  // const nav = `<nav class="modes" aria-label="View mode">${tab('#/explore', '🗽 My NYC', mode !== 'career')}${tab('#/career', '📜 Career', mode === 'career')}</nav>`;
+  
+  const nav = `<nav class="modes" aria-label="View mode">${tab('#/career', '📜 Career', mode === 'career')}${tab('#/explore', '🗽 My NYC', mode !== 'career')}</nav>`;
+
   if (mode === 'career') {
     hud.className = 'hud-career';
     hud.innerHTML = `<a class="brand" href="#/career" data-scroll="top">${esc(siteInfo.name)}</a>
@@ -78,7 +81,7 @@ function show(mode: 'career' | 'world'): void {
 }
 
 function route(): void {
-  const hash = location.hash || '#/explore';
+  const hash = location.hash || '#/career';
 
   careerCleanup?.();
   careerCleanup = null;
